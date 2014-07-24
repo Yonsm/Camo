@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		24E4D1F81980B33200E79713 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24E4D1F71980B33200E79713 /* main.cpp */; };
-		24E4D1FA1980B33200E79713 /* Camo.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 24E4D1F91980B33200E79713 /* Camo.1 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -18,7 +17,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				24E4D1FA1980B33200E79713 /* Camo.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -27,7 +25,6 @@
 /* Begin PBXFileReference section */
 		24E4D1F41980B33200E79713 /* Camo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Camo; sourceTree = BUILT_PRODUCTS_DIR; };
 		24E4D1F71980B33200E79713 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		24E4D1F91980B33200E79713 /* Camo.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Camo.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +58,6 @@
 			isa = PBXGroup;
 			children = (
 				24E4D1F71980B33200E79713 /* main.cpp */,
-				24E4D1F91980B33200E79713 /* Camo.1 */,
 			);
 			path = Camo;
 			sourceTree = "<group>";
@@ -227,6 +223,7 @@
 				24E4D1FF1980B33200E79713 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
