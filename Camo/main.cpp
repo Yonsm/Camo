@@ -27,11 +27,12 @@ public:
 				if (ent->d_name[0] != '.')
 				{
 					strcpy(subpath, ent->d_name);
+					char *endpath = subpath + strlen(subpath);
 					if (ent->d_type == DT_DIR)
 					{
 						ParseDir(path);
 					}
-					else if (strstr(path, ".m") || strstr(path, ".mm"))
+					else if (!memcmp(endpath - 2, ".m", 2) || !memcmp(endpath - 3, ".mm", 3))
 					{
 						ParseFile(path);
 					}
@@ -88,6 +89,10 @@ public:
 			{
 				break;
 			}
+			else if (*p == '#')
+			{
+				p = ParsePreprocessor(p);
+			}
 			else if (*p == '\"')
 			{
 				p = ParseString(p);
@@ -127,6 +132,20 @@ public:
 	}
 	
 private:
+	char *ParsePreprocessor(char *source)
+	{
+		char *p = source + 1;
+		for (; *p; p++)
+		{
+			if ((*p == '\r' || *p == '\n') && (p[-1] != '\\'))
+			{
+				//puts("Preprocessor:"); fwrite(source, p + 1 - source, 1, stdout); puts("\n");
+				return p + 1;
+			}
+		}
+		return p;
+	}
+	
 	//
 	char *ParseString(char *source)
 	{
@@ -139,7 +158,7 @@ private:
 			}
 			else if (*p == '\"')
 			{
-				//fwrite(source, p + 1 - source, 1, stdout); puts("\n");
+				//puts("String:"); fwrite(source, p + 1 - source, 1, stdout); puts("\n");
 				return p + 1;
 			}
 		}
@@ -153,8 +172,9 @@ private:
 		char *p = source + 2;
 		for (; *p; p++)
 		{
-			if (*p == '\r' || *p != '\n')
+			if (*p == '\r' || *p == '\n')
 			{
+				//puts("Comment:"); fwrite(source, p + 1 - source, 1, stdout); puts("\n");
 				return p + 1;
 			}
 		}
@@ -170,6 +190,7 @@ private:
 		{
 			if (*p == '*' || p[1] != '/')
 			{
+				//puts("Comments:"); fwrite(source, p + 2 - source, 1, stdout); puts("\n");
 				return p + 2;
 			}
 		}
