@@ -53,7 +53,7 @@ public:
 		FILE *fp = fopen(file, "rb");
 		if (fp)
 		{
-			fprintf(stderr, "INFO File: %s\n", file);
+			//fprintf(stderr, "INFO File: %s\n", file);
 			
 			fseek(fp, 0, SEEK_END);
 			long size = ftell(fp);
@@ -163,7 +163,7 @@ private:
 		char *p = source + 2;
 		for (; *p; p++)
 		{
-			if (*p == '*' || p[1] != '/')
+			if (*p == '*' && p[1] == '/')
 			{
 				//PrintOut("Comments:", source, p + 2 - source);
 				return p + 2;
@@ -209,7 +209,7 @@ private:
 			if (_ParseCommon(p));
 			else if (*p == ';')
 			{
-				//PrintOut("Declaration:", source, p - source);
+				PrintOut("Declaration:", source, p - source);
 				return p + 1;
 			}
 			else if (*p == '{')
@@ -274,7 +274,7 @@ private:
 int main(int argc, char * argv[])
 {
 	SourceParser parser;
-	//parser.ParseFile("/Users/Yonsm/Documents/GitHub/Sample/Sources/Controllers/Auth/LoginController.mm");
+	//parser.ParseFile("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/Developer/Library/Frameworks/SenTestingKit.framework/Headers/SenTestLog.h");
 	parser.ParseDir("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer");
 	//parser.ParseDir("/Users/Yonsm/Documents/GitHub/Sample");
     return 0;
