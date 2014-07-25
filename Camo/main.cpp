@@ -7,7 +7,7 @@
 
 //
 #define _ParseCommon(p)	*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
-class SourceParser
+class Camo
 {
 public:
 	//
@@ -107,6 +107,7 @@ public:
 	}
 	
 private:
+	//
 	char *ParsePreprocessor(char *source)
 	{
 		char *p = source + 1;
@@ -297,9 +298,9 @@ private:
 //
 int main(int argc, char * argv[])
 {
-	SourceParser parser;
+	Camo camo;
 	//parser.ParseFile("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSRunLoop.h");
-	parser.ParseDir("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer");
+	camo.ParseDir("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer");
 	//parser.ParseDir("/Users/Yonsm/Documents/GitHub/Sample");
 	return 0;
 }
