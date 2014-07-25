@@ -188,7 +188,11 @@ private:
 			{
 				p = ParseMetod(p);
 			}
-			else if (memcmp(p, "@end", 4) == 0)
+			else if (!memcmp(p, "@property", sizeof("@property") - 1))
+			{
+				p = ParseProperty(p);
+			}
+			else if (!memcmp(p, "@end", sizeof("@end") - 1))
 			{
 				return p + 4;
 			}
@@ -201,13 +205,13 @@ private:
 		return p;
 	}
 	
+	//
 	char *ParseMetod(char *source)
 	{
 		char *p = ParseSpace(source + 1);
 		while (*p)
 		{
-			if (_ParseCommon(p));
-			else if (*p == ';')
+			if (*p == ';')
 			{
 				PrintOut("Declaration:", source, p - source);
 				return p + 1;
@@ -225,6 +229,26 @@ private:
 		return p;
 	}
 	
+	//
+	char *ParseProperty(char *source)
+	{
+		char *p = ParseSpace(source + 1);
+		while (*p)
+		{
+			if (*p == ';')
+			{
+				PrintOut("Property:", source, p - source);
+				return p + 1;
+			}
+			else
+			{
+				p++;
+			}
+		}
+		return p;
+	}
+	
+	//
 	char *ParseBlock(char *source)
 	{
 		char *p = source + 1;
@@ -277,6 +301,6 @@ int main(int argc, char * argv[])
 	//parser.ParseFile("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/Developer/Library/Frameworks/SenTestingKit.framework/Headers/SenTestLog.h");
 	parser.ParseDir("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer");
 	//parser.ParseDir("/Users/Yonsm/Documents/GitHub/Sample");
-    return 0;
+	return 0;
 }
 
