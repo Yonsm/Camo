@@ -3,7 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <fcntl.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 //
 #define _ParseCommon(p)	*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
@@ -13,7 +16,7 @@ public:
 	//
 	void ParseDir(const char *dir)
 	{
-		DIR *dp = opendir (dir);
+		DIR *dp = opendir(dir);
 		if (dp)
 		{
 			char path[2048];
@@ -50,21 +53,19 @@ public:
 	//
 	void ParseFile(const char *file)
 	{
-		FILE *fp = fopen(file, "rb");
-		if (fp)
+		int fd = open(file, O_RDONLY);
+		if (fd)
 		{
 			//fprintf(stderr, "INFO File: %s\n", file);
+			struct stat stat;
+			fstat(fd, &stat);
 			
-			fseek(fp, 0, SEEK_END);
-			long size = ftell(fp);
-			fseek(fp, 0, SEEK_SET);
-			
-			char *source = (char *)malloc(size + 2);
+			char *source = (char *)malloc(stat.st_size + 2);
 			if (source)
 			{
-				fread(source, size, 1, fp);
-				source[size] = 0;
-				source[size + 1] = 0;	//
+				read(fd, source, stat.st_size);
+				source[stat.st_size] = 0;
+				source[stat.st_size + 1] = 0;	//
 				ParseSource(source);
 				free(source);
 			}
@@ -72,7 +73,7 @@ public:
 			{
 				fprintf(stderr, "ERROR Memory: %s\n", file);
 			}
-			fclose(fp);
+			close(fd);
 		}
 		else
 		{
