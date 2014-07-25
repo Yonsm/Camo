@@ -6,6 +6,7 @@
 #include <dirent.h>
 
 //
+#define _ParseCommon(p)	*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
 class SourceParser
 {
 public:
@@ -19,8 +20,8 @@ public:
 			strcpy(path, dir);
 			char *subpath = path + strlen(path);
 			*subpath++ = '/';
-
-			fprintf(stderr, "INFO Dir: %s\n", dir);
+			
+			//fprintf(stderr, "INFO Dir: %s\n", dir);
 			struct dirent *ent;
 			while ((ent = readdir(dp)))
 			{
@@ -32,7 +33,7 @@ public:
 					{
 						ParseDir(path);
 					}
-					else if (!memcmp(endpath - 2, ".m", 2) || !memcmp(endpath - 3, ".mm", 3))
+					else if (!memcmp(endpath - 2, ".h", 2) || !memcmp(endpath - 2, ".m", 2) || !memcmp(endpath - 3, ".mm", 3))
 					{
 						ParseFile(path);
 					}
@@ -83,46 +84,20 @@ public:
 	void ParseSource(char *source)
 	{
 		char *p = source;
-		while (true)
+		while (*p)
 		{
-			if (*p == 0)
+			if (_ParseCommon(p));
+			else if (!memcmp(p, "@interface", sizeof("@interface") - 1))
 			{
-				break;
+				p = ParseObject(p);
 			}
-			else if (*p == '#')
+			else if (!memcmp(p, "@protocol", sizeof("@protocol") - 1))
 			{
-				p = ParsePreprocessor(p);
+				p = ParseObject(p);
 			}
-			else if (*p == '\"')
+			else if (!memcmp(p, "@implementation", sizeof("@implementation") - 1))
 			{
-				p = ParseString(p);
-			}
-			else if (*p == '/')
-			{
-				if (p[1] == '/')
-				{
-					p = ParseComment(p);
-				}
-				else if (p[1] == '*')
-				{
-					p = ParseComments(p);
-				}
-				else
-				{
-					p++;
-				}
-			}
-			else if (strcmp(p, "@interface") == 0)
-			{
-				p = ParseInterface(p);
-			}
-			else if (strcmp(p, "@protocol") == 0)
-			{
-				p = ParseInterface(p);
-			}
-			else if (strcmp(p, "@implementation") == 0)
-			{
-				p = ParseInterface(p);
+				p = ParseObject(p);
 			}
 			else
 			{
@@ -139,7 +114,7 @@ private:
 		{
 			if ((*p == '\r' || *p == '\n') && (p[-1] != '\\'))
 			{
-				//puts("Preprocessor:"); fwrite(source, p + 1 - source, 1, stdout); puts("\n");
+				//PrintOut("Preprocessor:", source, p + 1 - source);
 				return p + 1;
 			}
 		}
@@ -158,7 +133,7 @@ private:
 			}
 			else if (*p == '\"')
 			{
-				//puts("String:"); fwrite(source, p + 1 - source, 1, stdout); puts("\n");
+				//PrintOut("String:", source, p + 1 - source);
 				return p + 1;
 			}
 		}
@@ -174,14 +149,14 @@ private:
 		{
 			if (*p == '\r' || *p == '\n')
 			{
-				//puts("Comment:"); fwrite(source, p + 1 - source, 1, stdout); puts("\n");
+				//PrintOut("Comment:", source, p + 1 - source);
 				return p + 1;
 			}
 		}
 		fprintf(stderr, "BROKEN Comment: %s\n", source);
 		return p;
 	}
-
+	
 	//
 	char *ParseComments(char *source)
 	{
@@ -190,7 +165,7 @@ private:
 		{
 			if (*p == '*' || p[1] != '/')
 			{
-				//puts("Comments:"); fwrite(source, p + 2 - source, 1, stdout); puts("\n");
+				//PrintOut("Comments:", source, p + 2 - source);
 				return p + 2;
 			}
 		}
@@ -199,9 +174,99 @@ private:
 	}
 	
 	//
-	char *ParseInterface(char *s)
+	char *ParseObject(char *source)
 	{
-		return s + 1;
+		char *p = ParseNonSpace(source);
+		char *name = ParseSpace(p);
+		p = ParseNonSpace(name);
+		PrintOut("Object:", source, p - source);
+		
+		while (*p)
+		{
+			if (_ParseCommon(p));
+			else if (*p == '-' || *p == '+')
+			{
+				p = ParseMetod(p);
+			}
+			else if (memcmp(p, "@end", 4) == 0)
+			{
+				return p + 4;
+			}
+			else
+			{
+				p++;
+			}
+		}
+		
+		return p;
+	}
+	
+	char *ParseMetod(char *source)
+	{
+		char *p = ParseSpace(source + 1);
+		while (*p)
+		{
+			if (_ParseCommon(p));
+			else if (*p == ';')
+			{
+				//PrintOut("Declaration:", source, p - source);
+				return p + 1;
+			}
+			else if (*p == '{')
+			{
+				PrintOut("Implentation:", source, p - source);
+				return ParseBlock(p);
+			}
+			else
+			{
+				p++;
+			}
+		}
+		return p;
+	}
+	
+	char *ParseBlock(char *source)
+	{
+		char *p = source + 1;
+		while (*p)
+		{
+			if (_ParseCommon(p));
+			else if (*p == '{')
+			{
+				p = ParseBlock(p);
+			}
+			else if (*p == '}')
+			{
+				return p + 1;
+			}
+			else
+			{
+				p++;
+			}
+		}
+		return p;
+	}
+	
+	//
+	inline char *ParseSpace(char *source)
+	{
+		while (*source == ' ' || *source == '\t' || *source == '\r' || *source == '\n') source++;
+		return source;
+	}
+	
+	//
+	inline char *ParseNonSpace(char *source)
+	{
+		while (*source != ' ' && *source != '\t' && *source != '\r' && *source != '\n' && *source != '\0') source++;
+		return source;
+	}
+	
+	//
+	inline void PrintOut(const char *type, char *source, size_t size)
+	{
+		puts(type);
+		fwrite(source, size, 1, stdout);
+		puts("\n");
 	}
 };
 
@@ -209,7 +274,9 @@ private:
 int main(int argc, char * argv[])
 {
 	SourceParser parser;
-	parser.ParseDir("/Users/Yonsm/Documents/GitHub/Sample");
+	//parser.ParseFile("/Users/Yonsm/Documents/GitHub/Sample/Sources/Controllers/Auth/LoginController.mm");
+	parser.ParseDir("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer");
+	//parser.ParseDir("/Users/Yonsm/Documents/GitHub/Sample");
     return 0;
 }
 
