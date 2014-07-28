@@ -1,8 +1,6 @@
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <strings.h>
+#include "CamoStore.h"
+#include <string.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -10,8 +8,11 @@
 
 //
 #define _ParseCommon(p)	*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
-class Camo
+class CamoParser
 {
+public:
+	CamoStore _store;
+	
 public:
 	//
 	void ParseDir(const char *dir)
@@ -60,14 +61,14 @@ public:
 			struct stat stat;
 			fstat(fd, &stat);
 			
-			char *source = (char *)malloc(stat.st_size + 2);
-			if (source)
+			char *code = (char *)malloc(stat.st_size + 2);
+			if (code)
 			{
-				read(fd, source, stat.st_size);
-				source[stat.st_size] = 0;
-				source[stat.st_size + 1] = 0;	//
-				ParseSource(source);
-				free(source);
+				read(fd, code, stat.st_size);
+				code[stat.st_size] = 0;
+				code[stat.st_size + 1] = 0;	//
+				ParseCode(code);
+				free(code);
 			}
 			else
 			{
@@ -82,9 +83,9 @@ public:
 	}
 	
 	//
-	void ParseSource(char *source)
+	void ParseCode(const char *code)
 	{
-		char *p = source;
+		const char *p = code;
 		while (*p)
 		{
 			if (_ParseCommon(p));
@@ -109,14 +110,14 @@ public:
 	
 private:
 	//
-	char *ParsePreprocessor(char *source)
+	const char *ParsePreprocessor(const char *code)
 	{
-		char *p = source + 1;
+		const char *p = code + 1;
 		for (; *p; p++)
 		{
 			if ((*p == '\r' || *p == '\n') && (p[-1] != '\\'))
 			{
-				//PrintOut("Preprocessor:", source, p + 1 - source);
+				//PrintOut("Preprocessor:", code, p + 1 - code);
 				return p + 1;
 			}
 		}
@@ -124,9 +125,9 @@ private:
 	}
 	
 	//
-	char *ParseString(char *source)
+	const char *ParseString(const char *code)
 	{
-		char *p = source + 1;
+		const char *p = code + 1;
 		for (; *p; p++)
 		{
 			if (*p == '\\')
@@ -135,53 +136,54 @@ private:
 			}
 			else if (*p == '\"')
 			{
-				//PrintOut("String:", source, p + 1 - source);
+				//PrintOut("String:", code, p + 1 - code);
 				return p + 1;
 			}
 		}
-		fprintf(stderr, "BROKEN String: %s\n", source);
+		fprintf(stderr, "BROKEN String: %s\n", code);
 		return p;
 	}
 	
 	//
-	char *ParseComment(char *source)
+	const char *ParseComment(const char *code)
 	{
-		char *p = source + 2;
+		const char *p = code + 2;
 		for (; *p; p++)
 		{
 			if (*p == '\r' || *p == '\n')
 			{
-				//PrintOut("Comment:", source, p + 1 - source);
+				//PrintOut("Comment:", code, p + 1 - code);
 				return p + 1;
 			}
 		}
-		fprintf(stderr, "BROKEN Comment: %s\n", source);
+		fprintf(stderr, "BROKEN Comment: %s\n", code);
 		return p;
 	}
 	
 	//
-	char *ParseComments(char *source)
+	const char *ParseComments(const char *code)
 	{
-		char *p = source + 2;
+		const char *p = code + 2;
 		for (; *p; p++)
 		{
 			if (*p == '*' && p[1] == '/')
 			{
-				//PrintOut("Comments:", source, p + 2 - source);
+				//PrintOut("Comments:", code, p + 2 - code);
 				return p + 2;
 			}
 		}
-		fprintf(stderr, "BROKEN Comments: %s\n", source);
+		fprintf(stderr, "BROKEN Comments: %s\n", code);
 		return p;
 	}
 	
 	//
-	char *ParseObject(char *source)
+	const char *ParseObject(const char *code)
 	{
-		char *p = ParseNonSpace(source);
-		char *name = ParseSpace(p);
+		const char *p = ParseNonSpace(code);
+		const char *name = ParseSpace(p);
 		p = ParseNonSpace(name);
-		PrintOut("Object:", source, p - source);
+		PrintOut("Object:", code, p - code);
+		_store.PushSymbol(code, p - code);
 		
 		while (*p)
 		{
@@ -208,19 +210,19 @@ private:
 	}
 	
 	//
-	char *ParseMetod(char *source)
+	const char *ParseMetod(const char *code)
 	{
-		char *p = ParseSpace(source + 1);
+		const char *p = ParseSpace(code + 1);
 		while (*p)
 		{
 			if (*p == ';')
 			{
-				PrintOut("Declaration:", source, p - source);
+				PrintOut("Declaration:", code, p - code);
 				return p + 1;
 			}
 			else if (*p == '{')
 			{
-				PrintOut("Implentation:", source, p - source);
+				PrintOut("Implentation:", code, p - code);
 				return ParseBlock(p);
 			}
 			else
@@ -232,14 +234,14 @@ private:
 	}
 	
 	//
-	char *ParseProperty(char *source)
+	const char *ParseProperty(const char *code)
 	{
-		char *p = ParseSpace(source + 1);
+		const char *p = ParseSpace(code + 1);
 		while (*p)
 		{
 			if (*p == ';')
 			{
-				PrintOut("Property:", source, p - source);
+				PrintOut("Property:", code, p - code);
 				return p + 1;
 			}
 			else
@@ -251,9 +253,9 @@ private:
 	}
 	
 	//
-	char *ParseBlock(char *source)
+	const char *ParseBlock(const char *code)
 	{
-		char *p = source + 1;
+		const char *p = code + 1;
 		while (*p)
 		{
 			if (_ParseCommon(p));
@@ -274,35 +276,24 @@ private:
 	}
 	
 	//
-	inline char *ParseSpace(char *source)
+	inline const char *ParseSpace(const char *code)
 	{
-		while (*source == ' ' || *source == '\t' || *source == '\r' || *source == '\n') source++;
-		return source;
+		while (*code == ' ' || *code == '\t' || *code == '\r' || *code == '\n') code++;
+		return code;
 	}
 	
 	//
-	inline char *ParseNonSpace(char *source)
+	inline const char *ParseNonSpace(const char *code)
 	{
-		while (*source != ' ' && *source != '\t' && *source != '\r' && *source != '\n' && *source != '\0') source++;
-		return source;
+		while (*code != ' ' && *code != '\t' && *code != '\r' && *code != '\n' && *code != '\0') code++;
+		return code;
 	}
 	
 	//
-	inline void PrintOut(const char *type, char *source, size_t size)
+	inline void PrintOut(const char *type, const char *code, size_t size)
 	{
 		puts(type);
-		fwrite(source, size, 1, stdout);
+		fwrite(code, size, 1, stdout);
 		puts("\n");
 	}
 };
-
-//
-int main(int argc, char * argv[])
-{
-	Camo camo;
-	//parser.ParseFile("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSRunLoop.h");
-	camo.ParseDir("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer");
-	//parser.ParseDir("/Users/Yonsm/Documents/GitHub/Sample");
-	return 0;
-}
-

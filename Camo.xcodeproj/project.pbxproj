@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		24E4D1F81980B33200E79713 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24E4D1F71980B33200E79713 /* main.cpp */; };
+		24E4D1F81980B33200E79713 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24E4D1F71980B33200E79713 /* Main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +24,10 @@
 
 /* Begin PBXFileReference section */
 		24E4D1F41980B33200E79713 /* Camo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Camo; sourceTree = BUILT_PRODUCTS_DIR; };
-		24E4D1F71980B33200E79713 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		24E4D1F71980B33200E79713 /* Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
+		24F211F6198647D800EEA09D /* CamoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CamoParser.h; sourceTree = "<group>"; };
+		24F211F7198647D800EEA09D /* CamoProducer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CamoProducer.h; sourceTree = "<group>"; };
+		24F211F8198647D800EEA09D /* CamoStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CamoStore.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +60,10 @@
 		24E4D1F61980B33200E79713 /* Camo */ = {
 			isa = PBXGroup;
 			children = (
-				24E4D1F71980B33200E79713 /* main.cpp */,
+				24F211F8198647D800EEA09D /* CamoStore.h */,
+				24F211F6198647D800EEA09D /* CamoParser.h */,
+				24F211F7198647D800EEA09D /* CamoProducer.h */,
+				24E4D1F71980B33200E79713 /* Main.cpp */,
 			);
 			path = Camo;
 			sourceTree = "<group>";
@@ -113,7 +119,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24E4D1F81980B33200E79713 /* main.cpp in Sources */,
+				24E4D1F81980B33200E79713 /* Main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
