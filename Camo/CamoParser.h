@@ -7,12 +7,20 @@
 #include <unistd.h>
 
 //
-#define _ParseSpace(p) while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
-#define _ParseCommon(p)	*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
+#define _ParseUntil(p, c)	while (*p != c) if (*p) p++; else return p;
+#define _ParseBeyond(p, c)	while (*p != c) if (*p) p++; else return p; p++;
+#define _ParseSpace(p)		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
+#define _ParseSolid(p)		while (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != ';' && *p != '{') if (*p) p++; else return p;
+#define _ParseCommon(p)		*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
 class CamoParser
 {
 public:
 	CamoStore _store;
+	
+	CamoParser()
+	{
+		ParseMethod("- (BOOL)animateAlongsideTransition:(void (^)(id <UIViewControllerTransitionCoordinatorContext>context))animation\n                        completion:(void (^)(id <UIViewControllerTransitionCoordinatorContext>context))completion;");
+	}
 	
 public:
 	//
@@ -177,21 +185,23 @@ private:
 		return p;
 	}
 	
-	//
+	// @interface Object
 	const char *ParseObject(const char *code)
 	{
-		const char *p = ParseNonSpace(code);
-		const char *name = ParseSpace(p);
-		p = ParseNonSpace(name);
+		const char *p = code;
+		_ParseSolid(p);
+		_ParseSpace(p);
+		const char *object = p;
+		_ParseSolid(p);
 		PrintOut("Object:", code, p - code);
-		_store.PushSymbol(code, p - code);
-		
+		//_store.PushSymbol(object, p - object);
+
 		while (*p)
 		{
 			if (_ParseCommon(p));
 			else if (*p == '-' || *p == '+')
 			{
-				p = ParseMetod(p);
+				p = ParseMethod(p);
 			}
 			else if (!memcmp(p, "@property", sizeof("@property") - 1))
 			{
@@ -210,50 +220,47 @@ private:
 		return p;
 	}
 	
-	//
-	const char *ParseMetod(const char *code)
+	// - ( void ) initWithFrame : ( CGRect ) frame  style : (UITableViewStyle) style __OSX_AVAILABLE_STARTING(__MAC_10_5, __MAC_10_7)
+	const char *ParseMethod(const char *code)
 	{
 		const char *p = code + 1;
-		while (*p != ')') {if (*p == 0) return p; else p++;}
-
-		const char *symbol = p = ParseSpace(p + 1);
+		_ParseUntil(p, '(');
+		p = ParseBlock(p);
+		_ParseSpace(p);
+		const char *symbol = p;
+		const char *end = NULL;
+		const char *first = symbol;
 		while (*p)
 		{
 			switch (*p)
 			{
 				case ';':
+					if (first == symbol) _store.PushSymbol(symbol, (end ?: p) - symbol);
+					PrintOut("Declaration:", code, p - code);
+					return p + 1;
+
 				case '{':
+					if (first == symbol) _store.PushSymbol(symbol, (end ?: p) - symbol);
+					PrintOut("Implentation:", code, p - code);
+					return ParseBlock(p);
+
 				case ':':
+					_store.PushSymbol(symbol, (end ?: p) - symbol);
+					_ParseUntil(p, '(');
+					p = ParseBlock(p);
+					_ParseSpace(p);
+					_ParseSolid(p);
+					_ParseSpace(p);
+					symbol = p;
+					end = NULL;
+					break;
+
 				case ' ':
 				case '\t':
 				case '\r':
 				case '\n':
-					if (symbol)
-					{
-						_store.PushSymbol(symbol, p - symbol);
-						symbol = NULL;
-					}
-					if (*p == ';')
-					{
-						PrintOut("Declaration:", code, p - code);
-						return p + 1;
-					}
-					else if (*p == '{')
-					{
-						PrintOut("Implentation:", code, p - code);
-						return ParseBlock(p);
-					}
-//					else if (*p == ':')
-//					{
-//						while (*p != ')')
-//						{
-//							if (*p == 0) return p;
-//							else p++;
-//						}
-//
-//						p = symbol = ParseSpace(p + 1);
-//					}
-					break;
+					if (end == NULL)
+						end = p;
 
 				default:
 					p++;
@@ -267,7 +274,8 @@ private:
 	//
 	const char *ParseProperty(const char *code)
 	{
-		const char *p = ParseSpace(code + 1);
+		const char *p = code + 1;
+		_ParseSpace(p);
 		while (*p)
 		{
 			if (*p == ';')
@@ -286,15 +294,17 @@ private:
 	//
 	const char *ParseBlock(const char *code)
 	{
+		char start = *code;
+		char end = (start == '(') ? ')' : (start + 1);
 		const char *p = code + 1;
 		while (*p)
 		{
 			if (_ParseCommon(p));
-			else if (*p == '{')
+			else if (*p == start)
 			{
 				p = ParseBlock(p);
 			}
-			else if (*p == '}')
+			else if (*p == end)
 			{
 				return p + 1;
 			}
@@ -305,26 +315,12 @@ private:
 		}
 		return p;
 	}
-
-	//
-	inline const char *ParseSpace(const char *code)
-	{
-		while (*code == ' ' || *code == '\t' || *code == '\r' || *code == '\n') code++;
-		return code;
-	}
-	
-	//
-	inline const char *ParseNonSpace(const char *code)
-	{
-		while (*code != ' ' && *code != '\t' && *code != '\r' && *code != '\n' && *code != '\0') code++;
-		return code;
-	}
 	
 	//
 	inline void PrintOut(const char *type, const char *code, size_t size)
 	{
-		puts(type);
-		fwrite(code, size, 1, stdout);
-		puts("\n");
+		//puts(type);
+		//fwrite(code, size, 1, stdout);
+		//puts("\n");
 	}
 };
