@@ -305,8 +305,8 @@ private:
 	const char *ParseSymbol(const char *code)
 	{
 		const char *p = code;
-		//while ((*p >= '0' && *p <= '9') || (*p >= 'a' || *p <= 'z') || (*p >= 'A' || *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
-		while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':') p++;
+		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
+		//while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':' && *p != ';') p++;
 		if (p > code) _store.PushSymbol(code, p - code);
 		return p;
 	}
