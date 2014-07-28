@@ -23,11 +23,6 @@ public:
 	//
 	bool PushSymbol(const char *code, size_t size)
 	{
-		if (size == 0)
-		{
-			return false;
-		}
-		
 		for (std::vector<char *>::iterator it = _symbols.begin(); it != _symbols.end(); ++it)
 		{
 			if (!strncmp(*it, code, size))

@@ -7,10 +7,6 @@
 #include <unistd.h>
 
 //
-#define _ParseUntil(p, c)	while (*p != c) if (*p) p++; else return p;
-#define _ParseBeyond(p, c)	while (*p != c) if (*p) p++; else return p; p++;
-#define _ParseSpace(p)		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
-#define _ParseSolid(p)		while (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != ';' && *p != '{') if (*p) p++; else return p;
 #define _ParseCommon(p)		*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
 class CamoParser
 {
@@ -189,13 +185,11 @@ private:
 	const char *ParseObject(const char *code)
 	{
 		const char *p = code;
-		_ParseSolid(p);
-		_ParseSpace(p);
-		const char *object = p;
-		_ParseSolid(p);
+		p = ParseSolid(p);
+		p = ParseSpace(p);
+		p = ParseSymbol(p);
 		PrintOut("Object:", code, p - code);
-		//_store.PushSymbol(object, p - object);
-
+		
 		while (*p)
 		{
 			if (_ParseCommon(p));
@@ -224,58 +218,49 @@ private:
 	const char *ParseMethod(const char *code)
 	{
 		const char *p = code + 1;
-		_ParseUntil(p, '(');
+		p = ParseUntil(p);
 		p = ParseBlock(p);
-		_ParseSpace(p);
+		p = ParseSpace(p);
 		const char *symbol = p;
-		const char *end = NULL;
 		const char *first = symbol;
 		while (*p)
 		{
 			switch (*p)
 			{
 				case ';':
-					if (first == symbol) _store.PushSymbol(symbol, (end ?: p) - symbol);
+					if (first == symbol) ParseSymbol(symbol);
 					PrintOut("Declaration:", code, p - code);
 					return p + 1;
-
+					
 				case '{':
-					if (first == symbol) _store.PushSymbol(symbol, (end ?: p) - symbol);
+					if (first == symbol) ParseSymbol(symbol);
 					PrintOut("Implentation:", code, p - code);
 					return ParseBlock(p);
-
+					
 				case ':':
-					_store.PushSymbol(symbol, (end ?: p) - symbol);
-					_ParseUntil(p, '(');
+					ParseSymbol(symbol);
+					p = ParseUntil(p);
 					p = ParseBlock(p);
-					_ParseSpace(p);
-					_ParseSolid(p);
-					_ParseSpace(p);
+					p = ParseSpace(p);
+					p = ParseSolid(p);
+					p = ParseSpace(p);
 					symbol = p;
-					end = NULL;
 					break;
-
-				case ' ':
-				case '\t':
-				case '\r':
-				case '\n':
-					if (end == NULL)
-						end = p;
-
+					
 				default:
 					p++;
 					break;
 			}
 		}
-
+		
 		return p;
 	}
-
+	
 	//
 	const char *ParseProperty(const char *code)
 	{
 		const char *p = code + 1;
-		_ParseSpace(p);
+		p = ParseSpace(p);
 		while (*p)
 		{
 			if (*p == ';')
@@ -316,6 +301,46 @@ private:
 		return p;
 	}
 	
+	//
+	const char *ParseSymbol(const char *code)
+	{
+		const char *p = code;
+		//while ((*p >= '0' && *p <= '9') || (*p >= 'a' || *p <= 'z') || (*p >= 'A' || *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
+		while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':') p++;
+		if (p > code) _store.PushSymbol(code, p - code);
+		return p;
+	}
+	
+private:
+	//
+	inline const char *ParseUntil(const char *p, char c = '(')
+	{
+		while (*p != c) if (*p) p++; else return p;
+		return p;
+	}
+	
+	//
+	//	inline const char *ParseBeyond(const char *p, char c = ')')
+	//	{
+	//		while (*p != c) if (*p) p++; else return p;
+	//		return p++;
+	//	}
+	
+	//
+	inline const char *ParseSpace(const char *p)
+	{
+		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
+		return p;
+	}
+	
+	//
+	inline const char *ParseSolid(const char *p)
+	{
+		while (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != ';' && *p != '{') if (*p) p++; else return p;
+		return p;
+	}
+	
+private:
 	//
 	inline void PrintOut(const char *type, const char *code, size_t size)
 	{
