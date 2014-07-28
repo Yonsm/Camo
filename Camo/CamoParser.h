@@ -7,16 +7,10 @@
 #include <unistd.h>
 
 //
-#define _ParseCommon(p)		*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
 class CamoParser
 {
 public:
 	CamoStore _store;
-	
-	CamoParser()
-	{
-		ParseMethod("- (BOOL)animateAlongsideTransition:(void (^)(id <UIViewControllerTransitionCoordinatorContext>context))animation\n                        completion:(void (^)(id <UIViewControllerTransitionCoordinatorContext>context))completion;");
-	}
 	
 public:
 	//
@@ -93,7 +87,10 @@ public:
 		const char *p = code;
 		while (*p)
 		{
-			if (_ParseCommon(p));
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
 			else if (!memcmp(p, "@interface", sizeof("@interface") - 1))
 			{
 				p = ParseObject(p);
@@ -114,6 +111,28 @@ public:
 	}
 	
 private:
+	//
+	inline const char *ParseCommon(const char *code)
+	{
+		if (*code == '#')
+		{
+			return ParsePreprocessor(code);
+		}
+		else if (*code == '\"')
+		{
+			return ParseString(code);
+		}
+		else if (*code == '/' && code[1] == '/')
+		{
+			return ParseComment(code);
+		}
+		else if (*code == '/' && code[1] == '*')
+		{
+			return ParseComments(code);
+		}
+		return NULL;
+	}
+	
 	//
 	const char *ParsePreprocessor(const char *code)
 	{
@@ -181,7 +200,8 @@ private:
 		return p;
 	}
 	
-	// @interface Object
+private:
+	//
 	const char *ParseObject(const char *code)
 	{
 		const char *p = code;
@@ -192,7 +212,10 @@ private:
 		
 		while (*p)
 		{
-			if (_ParseCommon(p));
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
 			else if (*p == '-' || *p == '+')
 			{
 				p = ParseMethod(p);
@@ -214,7 +237,7 @@ private:
 		return p;
 	}
 	
-	// - ( void ) initWithFrame : ( CGRect ) frame  style : (UITableViewStyle) style __OSX_AVAILABLE_STARTING(__MAC_10_5, __MAC_10_7)
+	//
 	const char *ParseMethod(const char *code)
 	{
 		const char *p = code + 1;
@@ -225,7 +248,11 @@ private:
 		const char *first = symbol;
 		while (*p)
 		{
-			switch (*p)
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
+			else switch (*p)
 			{
 				case ';':
 					if (first == symbol) ParseSymbol(symbol);
@@ -284,7 +311,10 @@ private:
 		const char *p = code + 1;
 		while (*p)
 		{
-			if (_ParseCommon(p));
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
 			else if (*p == start)
 			{
 				p = ParseBlock(p);
@@ -318,14 +348,7 @@ private:
 		while (*p != c) if (*p) p++; else return p;
 		return p;
 	}
-	
-	//
-	//	inline const char *ParseBeyond(const char *p, char c = ')')
-	//	{
-	//		while (*p != c) if (*p) p++; else return p;
-	//		return p++;
-	//	}
-	
+
 	//
 	inline const char *ParseSpace(const char *p)
 	{
@@ -339,7 +362,7 @@ private:
 		while (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != ';' && *p != '{') if (*p) p++; else return p;
 		return p;
 	}
-	
+
 private:
 	//
 	inline void PrintOut(const char *type, const char *code, size_t size)
