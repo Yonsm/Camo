@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 //
+#define _ParseSpace(p) while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
 #define _ParseCommon(p)	*p == '#') p = ParsePreprocessor(p); else if (*p == '\"') p = ParseString(p); else if (*p == '/' && p[1] == '/') p = ParseComment(p); else if (*p == '/' && p[1] == '*') p = ParseComments(p
 class CamoParser
 {
@@ -212,27 +213,57 @@ private:
 	//
 	const char *ParseMetod(const char *code)
 	{
-		const char *p = ParseSpace(code + 1);
+		const char *p = code + 1;
+		while (*p != ')') {if (*p == 0) return p; else p++;}
+
+		const char *symbol = p = ParseSpace(p + 1);
 		while (*p)
 		{
-			if (*p == ';')
+			switch (*p)
 			{
-				PrintOut("Declaration:", code, p - code);
-				return p + 1;
-			}
-			else if (*p == '{')
-			{
-				PrintOut("Implentation:", code, p - code);
-				return ParseBlock(p);
-			}
-			else
-			{
-				p++;
+				case ';':
+				case '{':
+				case ':':
+				case ' ':
+				case '\t':
+				case '\r':
+				case '\n':
+					if (symbol)
+					{
+						_store.PushSymbol(symbol, p - symbol);
+						symbol = NULL;
+					}
+					if (*p == ';')
+					{
+						PrintOut("Declaration:", code, p - code);
+						return p + 1;
+					}
+					else if (*p == '{')
+					{
+						PrintOut("Implentation:", code, p - code);
+						return ParseBlock(p);
+					}
+//					else if (*p == ':')
+//					{
+//						while (*p != ')')
+//						{
+//							if (*p == 0) return p;
+//							else p++;
+//						}
+//
+//						p = symbol = ParseSpace(p + 1);
+//					}
+					break;
+
+				default:
+					p++;
+					break;
 			}
 		}
+
 		return p;
 	}
-	
+
 	//
 	const char *ParseProperty(const char *code)
 	{
@@ -274,7 +305,7 @@ private:
 		}
 		return p;
 	}
-	
+
 	//
 	inline const char *ParseSpace(const char *code)
 	{
