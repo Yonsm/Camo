@@ -109,7 +109,6 @@ public:
 		}
 	}
 	
-private:
 	// @interface @implementation @protocol
 	const char *ParseObject(const char *code)
 	{
@@ -142,7 +141,7 @@ private:
 				p++;
 			}
 		}
-		
+		fprintf(stderr, "BROKEN Object: %s\n", code);
 		return p;
 	}
 	
@@ -164,17 +163,17 @@ private:
 			else switch (*p)
 			{
 				case ';':
-					if (first == symbol) ParseSymbol(symbol);
+					if (first == symbol) ParseMethodSymbol(symbol);
 					PrintOut("Declaration:", code, p - code);
 					return p + 1;
 					
 				case '{':
-					if (first == symbol) ParseSymbol(symbol);
+					if (first == symbol) ParseMethodSymbol(symbol);
 					PrintOut("Implentation:", code, p - code);
 					return ParseBlock(p);
 					
 				case ':':
-					ParseSymbol(symbol);
+					ParseMethodSymbol(symbol, first == symbol);
 					p = ParseUntil(p, '(');
 					p = ParseBlock(p);
 					p = ParseBlank(p);
@@ -188,13 +187,14 @@ private:
 					break;
 			}
 		}
-		
+		fprintf(stderr, "BROKEN Method: %s\n", code);
 		return p;
 	}
 	
-	// @property (...)
+	// @property (...) BOOL ** aa;
 	const char *ParseProperty(const char *code)
 	{
+		bool readonly = false;
 		const char *p = code + sizeof("@propterty") - 1;
 		while (*p)
 		{
@@ -203,9 +203,13 @@ private:
 				p = ParseBlank(p + 1);
 				p = ParseSolid(p);
 				while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '*') p++;
-				p = ParseSymbol(p);
+				p = ParsePropertySymbol(p, !readonly);
 				while (*p && *p++ != ';');
 				return p;
+			}
+			else if (!memcmp(p, "readonly", sizeof("readonly") - 1))
+			{
+				readonly = true;
 			}
 			else if (!memcmp(p, "getter", sizeof("getter") - 1) || !memcmp(p, "setter", sizeof("setter") - 1))
 			{
@@ -218,6 +222,36 @@ private:
 			{
 				p++;
 			}
+		}
+		fprintf(stderr, "BROKEN Property: %s\n", code);
+		return p;
+	}
+	
+	//
+	const char *ParseMethodSymbol(const char *code, bool checkSetter = true)
+	{
+		const char *p = ParseSymbol(code);
+		if (checkSetter && !memcmp(code, "set", 3) && (p - code > 4) && (p - code < 250))
+		{
+			char property[250];
+			property[0] = tolower(code[3]);
+			memcpy(property + 1, code + 4, p - code - 3);
+			ParseSymbol(property);
+		}
+		return p;
+	}
+	
+	//
+	const char *ParsePropertySymbol(const char *code, bool checkProperty = true)
+	{
+		const char *p = ParseSymbol(code);
+		if (checkProperty && (p > code) && (p - code < 250))
+		{
+			char setter[256];
+			memcpy(setter, "set", 3);
+			setter[3] = toupper(*code);
+			memcpy(setter + 4, code + 1, p - code);
+			ParseSymbol(setter);
 		}
 		return p;
 	}
@@ -331,7 +365,7 @@ private:
 	const char *ParseBlock(const char *code)
 	{
 		char start = *code;
-		char end = (start == '(') ? ')' : (start + 1);
+		char end = (start == '(') ? ')' : (start + 2);
 		const char *p = code + 1;
 		while (*p)
 		{
@@ -352,6 +386,7 @@ private:
 				p++;
 			}
 		}
+		fprintf(stderr, "BROKEN Block: %s\n", code);
 		return p;
 	}
 	
