@@ -207,10 +207,6 @@ public:
 				while (*p && *p++ != ';');
 				return p;
 			}
-			else if (!memcmp(p, "readonly", sizeof("readonly") - 1))
-			{
-				readonly = true;
-			}
 			else if (!memcmp(p, "getter", sizeof("getter") - 1) || !memcmp(p, "setter", sizeof("setter") - 1))
 			{
 				p += sizeof("getter") - 1;
@@ -220,6 +216,10 @@ public:
 			}
 			else
 			{
+				if (!memcmp(p, "readonly", sizeof("readonly") - 1))
+				{
+					readonly = true;
+				}
 				p++;
 			}
 		}
