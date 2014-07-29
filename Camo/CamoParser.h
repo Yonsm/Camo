@@ -56,7 +56,7 @@ public:
 		int fd = open(file, O_RDONLY);
 		if (fd)
 		{
-			//fprintf(stderr, "INFO File: %s\n", file);
+			fprintf(stderr, "INFO File: %s\n", file);
 			struct stat stat;
 			fstat(fd, &stat);
 			
@@ -118,7 +118,7 @@ private:
 		{
 			return ParsePreprocessor(code);
 		}
-		else if (*code == '\"')
+		else if (*code == '\'' || *code == '\"')
 		{
 			return ParseString(code);
 		}
@@ -129,6 +129,10 @@ private:
 		else if (*code == '/' && code[1] == '*')
 		{
 			return ParseComments(code);
+		}
+		else if (*code == '\\')
+		{
+			return code + 2;
 		}
 		return NULL;
 	}
@@ -148,9 +152,10 @@ private:
 		return p;
 	}
 	
-	//
+	// ' or " block
 	const char *ParseString(const char *code)
 	{
+		char ch = *code;
 		const char *p = code + 1;
 		for (; *p; p++)
 		{
@@ -158,7 +163,7 @@ private:
 			{
 				p++;
 			}
-			else if (*p == '\"')
+			else if (*p == ch)
 			{
 				//PrintOut("String:", code, p + 1 - code);
 				return p + 1;
@@ -199,6 +204,35 @@ private:
 		fprintf(stderr, "BROKEN Comments: %s\n", code);
 		return p;
 	}
+	
+	//  Nest block () [] {}
+	const char *ParseBlock(const char *code)
+	{
+		char start = *code;
+		char end = (start == '(') ? ')' : (start + 1);
+		const char *p = code + 1;
+		while (*p)
+		{
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
+			else if (*p == start)
+			{
+				p = ParseBlock(p);
+			}
+			else if (*p == end)
+			{
+				return p + 1;
+			}
+			else
+			{
+				p++;
+			}
+		}
+		return p;
+	}
+
 	
 private:
 	//
@@ -302,35 +336,7 @@ private:
 		}
 		return p;
 	}
-	
-	//
-	const char *ParseBlock(const char *code)
-	{
-		char start = *code;
-		char end = (start == '(') ? ')' : (start + 1);
-		const char *p = code + 1;
-		while (*p)
-		{
-			if (const char *q = ParseCommon(p))
-			{
-				p = q;
-			}
-			else if (*p == start)
-			{
-				p = ParseBlock(p);
-			}
-			else if (*p == end)
-			{
-				return p + 1;
-			}
-			else
-			{
-				p++;
-			}
-		}
-		return p;
-	}
-	
+		
 	//
 	const char *ParseSymbol(const char *code)
 	{
