@@ -56,7 +56,7 @@ public:
 		int fd = open(file, O_RDONLY);
 		if (fd)
 		{
-			fprintf(stderr, "INFO File: %s\n", file);
+			//fprintf(stderr, "INFO File: %s\n", file);
 			struct stat stat;
 			fstat(fd, &stat);
 			
