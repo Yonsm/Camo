@@ -112,6 +112,119 @@ public:
 	
 private:
 	//
+	const char *ParseObject(const char *code)
+	{
+		const char *p = code;
+		p = ParseSolid(p);
+		p = ParseSpace(p);
+		p = ParseSymbol(p);
+		PrintOut("Object:", code, p - code);
+		
+		while (*p)
+		{
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
+			else if (*p == '-' || *p == '+')
+			{
+				p = ParseMethod(p);
+			}
+			else if (!memcmp(p, "@property", sizeof("@property") - 1))
+			{
+				p = ParseProperty(p);
+			}
+			else if (!memcmp(p, "@end", sizeof("@end") - 1))
+			{
+				return p + 4;
+			}
+			else
+			{
+				p++;
+			}
+		}
+		
+		return p;
+	}
+	
+	//
+	const char *ParseMethod(const char *code)
+	{
+		const char *p = code + 1;
+		p = ParseUntil(p, '(');
+		p = ParseBlock(p);
+		p = ParseSpace(p);
+		const char *symbol = p;
+		const char *first = symbol;
+		while (*p)
+		{
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
+			else switch (*p)
+			{
+				case ';':
+					if (first == symbol) ParseSymbol(symbol);
+					PrintOut("Declaration:", code, p - code);
+					return p + 1;
+					
+				case '{':
+					if (first == symbol) ParseSymbol(symbol);
+					PrintOut("Implentation:", code, p - code);
+					return ParseBlock(p);
+					
+				case ':':
+					ParseSymbol(symbol);
+					p = ParseUntil(p, '(');
+					p = ParseBlock(p);
+					p = ParseSpace(p);
+					p = ParseSolid(p);
+					p = ParseSpace(p);
+					symbol = p;
+					break;
+					
+				default:
+					p++;
+					break;
+			}
+		}
+		
+		return p;
+	}
+	
+	//TODO:
+	const char *ParseProperty(const char *code)
+	{
+		const char *p = code + 1;
+		p = ParseSpace(p);
+		while (*p)
+		{
+			if (*p == ';')
+			{
+				PrintOut("Property:", code, p - code);
+				return p + 1;
+			}
+			else
+			{
+				p++;
+			}
+		}
+		return p;
+	}
+	
+	//
+	const char *ParseSymbol(const char *code)
+	{
+		const char *p = code;
+		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
+		//while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':' && *p != ';') p++;
+		if (p > code) _store.PushSymbol(code, p - code);
+		return p;
+	}
+	
+private:
+	//
 	inline const char *ParseCommon(const char *code)
 	{
 		if (*code == '#')
@@ -232,129 +345,15 @@ private:
 		}
 		return p;
 	}
-
 	
 private:
 	//
-	const char *ParseObject(const char *code)
-	{
-		const char *p = code;
-		p = ParseSolid(p);
-		p = ParseSpace(p);
-		p = ParseSymbol(p);
-		PrintOut("Object:", code, p - code);
-		
-		while (*p)
-		{
-			if (const char *q = ParseCommon(p))
-			{
-				p = q;
-			}
-			else if (*p == '-' || *p == '+')
-			{
-				p = ParseMethod(p);
-			}
-			else if (!memcmp(p, "@property", sizeof("@property") - 1))
-			{
-				p = ParseProperty(p);
-			}
-			else if (!memcmp(p, "@end", sizeof("@end") - 1))
-			{
-				return p + 4;
-			}
-			else
-			{
-				p++;
-			}
-		}
-		
-		return p;
-	}
-	
-	//
-	const char *ParseMethod(const char *code)
-	{
-		const char *p = code + 1;
-		p = ParseUntil(p);
-		p = ParseBlock(p);
-		p = ParseSpace(p);
-		const char *symbol = p;
-		const char *first = symbol;
-		while (*p)
-		{
-			if (const char *q = ParseCommon(p))
-			{
-				p = q;
-			}
-			else switch (*p)
-			{
-				case ';':
-					if (first == symbol) ParseSymbol(symbol);
-					PrintOut("Declaration:", code, p - code);
-					return p + 1;
-					
-				case '{':
-					if (first == symbol) ParseSymbol(symbol);
-					PrintOut("Implentation:", code, p - code);
-					return ParseBlock(p);
-					
-				case ':':
-					ParseSymbol(symbol);
-					p = ParseUntil(p);
-					p = ParseBlock(p);
-					p = ParseSpace(p);
-					p = ParseSolid(p);
-					p = ParseSpace(p);
-					symbol = p;
-					break;
-					
-				default:
-					p++;
-					break;
-			}
-		}
-		
-		return p;
-	}
-	
-	//TODO:
-	const char *ParseProperty(const char *code)
-	{
-		const char *p = code + 1;
-		p = ParseSpace(p);
-		while (*p)
-		{
-			if (*p == ';')
-			{
-				PrintOut("Property:", code, p - code);
-				return p + 1;
-			}
-			else
-			{
-				p++;
-			}
-		}
-		return p;
-	}
-		
-	//
-	const char *ParseSymbol(const char *code)
-	{
-		const char *p = code;
-		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
-		//while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':' && *p != ';') p++;
-		if (p > code) _store.PushSymbol(code, p - code);
-		return p;
-	}
-	
-private:
-	//
-	inline const char *ParseUntil(const char *p, char c = '(')
+	inline const char *ParseUntil(const char *p, char c)
 	{
 		while (*p != c) if (*p) p++; else return p;
 		return p;
 	}
-
+	
 	//
 	inline const char *ParseSpace(const char *p)
 	{
@@ -368,7 +367,7 @@ private:
 		while (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != ';' && *p != '{') if (*p) p++; else return p;
 		return p;
 	}
-
+	
 private:
 	//
 	inline void PrintOut(const char *type, const char *code, size_t size)
