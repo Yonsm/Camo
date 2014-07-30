@@ -12,23 +12,27 @@ public:
 		unsigned count = (unsigned)items.size();
 		for (unsigned i = begin; i < count; i++)
 		{
-			if (items[i]->type != CamoItemIgnore)
+			CamoItem &item = *items[i];
+			if (item.type == CamoItemIgnore)
 			{
-				write(fd, "#define ", sizeof("#define ") - 1);
-				write(fd, items[i]->symbol, items[i]->length);
-				
-				for (unsigned j = items[i]->length; j <= items.maxLength; j++)
-				{
-					write(fd, " ", 1);
-				}
-				
-				CamoItem *newItem = NewItem();
-				write(fd, newItem->symbol, newItem->length);
-				write(fd, "\n", 1);
+				write(fd, "//", 2);
 			}
+
+			write(fd, "#define ", sizeof("#define ") - 1);
+			write(fd, item.symbol, item.length);
+			
+			for (unsigned j = item.length; j <= items.maxLength; j++)
+			{
+				write(fd, " ", 1);
+			}
+			
+			CamoItem *newItem = NewItem();
+			write(fd, newItem->symbol, newItem->length);
+			
+			write(fd, "\n", 1);
 		}
 	}
-	
+
 private:
 	//
 	CamoItem *NewItem()
