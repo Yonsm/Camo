@@ -12,10 +12,17 @@ public:
 		size_t count = symbols.size();
 		for (unsigned int i = begin; i < count; i++)
 		{
-			unsigned int length;
-			char *symbol = symbols[i];
 			write(fd, "#define ", sizeof("#define ") - 1);
-			write(fd, symbol, strlen(symbol));
+
+			char *symbol = symbols[i];
+			size_t length = strlen(symbol);
+			write(fd, symbol, length);
+			
+			for (size_t i = length; i <= symbols.maxLength; i++)
+			{
+				write(fd, " ", 1);
+			}
+			
 			write(fd, NewSymbol(length), length);
 			write(fd, "\n", 1);
 		}
@@ -23,7 +30,7 @@ public:
 
 private:
 	//
-	char *NewSymbol(unsigned int &length)
+	char *NewSymbol(size_t &length)
 	{
 		const static char newSymbolChars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
 		while (true)

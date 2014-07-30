@@ -5,14 +5,14 @@
 //
 class CamoStore : public std::vector<char *>
 {
-//public:
-//	size_t maxLength;
+public:
+	size_t maxLength;
 	
 public:
-//	inline CamoStore()
-//	{
-//		maxLength = 0;
-//	}
+	inline CamoStore()
+	{
+		maxLength = 0;
+	}
 	
 	//
 	inline ~CamoStore()
@@ -35,10 +35,10 @@ public:
 			}
 		}
 		
-//		if (maxLength < length)
-//		{
-//			maxLength = length;
-//		}
+		if (maxLength < length)
+		{
+			maxLength = length;
+		}
 		
 		char *symbol = (char *)malloc(length + 1);
 		memcpy(symbol, string, length);
