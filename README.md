@@ -2,11 +2,11 @@
 Camo Preprocessor
 ======
 <pre>
-Camo Preprocessor 1.0.3
+Camo Preprocessor 1.0.4
 Symbol Confusion for Objective C/C++
 Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.
 
-Usage: %s &lt;OutFile|$&gt; [-]&lt;File1|Dir1&gt; [-]&lt;File2|Dir2&gt; [-] ...
+Usage: Camo &lt;OutFile|$&gt; [-]&lt;File1|Dir1&gt; [-]&lt;File2|Dir2&gt; [-] ...
 
        OutFile     Output symbols redifinition to file
        $           Output symbols redifinition to stdout

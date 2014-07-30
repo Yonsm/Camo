@@ -6,13 +6,13 @@
 //
 int main(int argc, char * argv[])
 {
-	puts("Camo Preprocessor 1.0.3\n"
+	puts("Camo Preprocessor 1.0.4\n"
 		 "Symbol Confusion for Objective C/C++\n"
 		 "Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.\n");
 	
 	if (argc < 3)
 	{
-		puts("Usage: %s <OutFile|$> [-]<File1|Dir1> [-]<File2|Dir2> [-] ...\n\n"
+		puts("Usage: Camo <OutFile|$> [-]<File1|Dir1> [-]<File2|Dir2> [-] ...\n\n"
 			 "       OutFile     Output symbols redifinition to file\n"
 			 "       $           Output symbols redifinition to stdout\n"
 			 "       File|Dir    Include symbols from file or dir\n"
