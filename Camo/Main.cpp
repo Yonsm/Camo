@@ -81,5 +81,5 @@ int main(int argc, char * argv[])
 		puts("WARNING: No symbols found.\n");
 	}
 	
-	return 0;
+	return EXIT_SUCCESS;
 }
