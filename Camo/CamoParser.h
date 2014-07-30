@@ -94,7 +94,7 @@ public:
 			printf("ERROR File: %s\n", file);
 		}
 	}
-
+	
 	//
 	void ParseCode(const char *code)
 	{
@@ -132,7 +132,7 @@ public:
 		p = ParseBlank(p);
 		p = ParseSymbol(p);
 		PrintOut("OBJECT:", code, p);
-
+		
 		while (*p)
 		{
 			if (const char *q = ParseCommon(p))
@@ -321,7 +321,7 @@ private:
 		{
 			if ((*p == '\r' || *p == '\n') && (p[-1] != '\\'))
 			{
-				//PrintOut("Preprocessor:", code, p + 1 - code);
+				PrintOut("PREPROCESSOR:", code, p + 1);
 				return p + 1;
 			}
 		}
@@ -357,7 +357,7 @@ private:
 		{
 			if (*p == '\r' || *p == '\n')
 			{
-				//PrintOut("COMMENT:", code, p + 1);
+				PrintOut("COMMENT:", code, p + 1);
 				return p + 1;
 			}
 		}
@@ -373,7 +373,7 @@ private:
 		{
 			if (*p == '*' && p[1] == '/')
 			{
-				//PrintOut("COMMENTS:", code, p + 2);
+				PrintOut("COMMENTS:", code, p + 2);
 				return p + 2;
 			}
 		}
@@ -436,8 +436,8 @@ private:
 	//
 	inline void PrintOut(const char *type, const char *code, const char *end)
 	{
-//		puts(type);
-//		fwrite(code, end - code, 1, stdout);
-//		puts("\n");
+		//puts(type);
+		//fwrite(code, end - code, 1, stdout);
+		//puts("\n");
 	}
 };
