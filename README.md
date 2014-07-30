@@ -23,4 +23,4 @@ Example: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
 
 Download Binary: [Camo for Mac OS X 10.9+](https://raw.githubusercontent.com/Yonsm/Camo/master/Release/Camo)
 
-More Info: <HTTP://YONSM.NET/Camo>
+More Info: <http://yonsm.net/camo>
