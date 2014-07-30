@@ -19,3 +19,6 @@ Example: Camo $ ./Sources
 Example: Camo ./CamoPrefix.h ./Sources -
 
 Example: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
+
+
+Download: Ref Release/Camo, only run on Mac OS X 10.9+
