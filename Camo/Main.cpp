@@ -12,7 +12,8 @@ int main(int argc, char * argv[])
 	//parser.ParseDir("/Users/Yonsm/Documents/GitHub/Sample");
 	//parser.ParseMethod(" - (void)setAbc:(BOOL)a; @property(XXX) BOOL *** ddd;");
 	
-	CamoProducer producer(parser);
+	CamoProducer producer;
+	producer.ProduceNewSymbols(fileno(stdout), parser);
 
 	return 0;
 }

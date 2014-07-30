@@ -5,32 +5,37 @@
 class CamoProducer
 {
 public:
-	CamoProducer(CamoStore &symbols, unsigned int begin = 0)
+	//
+	void ProduceNewSymbols(int fd, CamoStore &symbols, unsigned int begin = 0)
 	{
 		srand((unsigned)time(NULL));
 		size_t count = symbols.size();
 		for (unsigned int i = begin; i < count; i++)
 		{
+			unsigned int length;
 			char *symbol = symbols[i];
-			printf("#define %s %s\n", symbol, NewSymbol());
+			write(fd, "#define ", sizeof("#define ") - 1);
+			write(fd, symbol, strlen(symbol));
+			write(fd, NewSymbol(length), length);
+			write(fd, "\n", 1);
 		}
 	}
-	
+
 private:
 	//
-	char *NewSymbol()
+	char *NewSymbol(unsigned int &length)
 	{
 		const static char newSymbolChars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
-		char symbol[256];
 		while (true)
 		{
-			unsigned int length = 5 + rand() % 10;
+			char buffer[256];
+			length = 5 + rand() % 10;
 			for (unsigned int i = 0; i < length; i++)
 			{
-				symbol[i] = newSymbolChars[rand() % (sizeof(newSymbolChars) - 1)];
+				buffer[i] = newSymbolChars[rand() % (sizeof(newSymbolChars) - 1)];
 			}
 			
-			char *newSymbol = _newSymbols.PushSymbol(symbol, length);
+			char *newSymbol = _newSymbols.PushSymbol(buffer, length);
 			if (newSymbol)
 			{
 				return newSymbol;
