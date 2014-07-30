@@ -8,6 +8,7 @@ enum CamoItemType
 	CamoItemNormal,
 	CamoItemIgnore,
 	CamoItemProperty,
+	CamoItemReadOnlyProperty,
 };
 
 //

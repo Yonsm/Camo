@@ -228,7 +228,7 @@ private:
 	// @property (...) BOOL ** aa;
 	const char *ParseProperty(const char *code)
 	{
-		bool readonly = false;
+		CamoItemType type = CamoItemProperty;
 		const char *p = code + sizeof("@propterty") - 1;
 		p = ParseBlank(p);
 		if (*p == '(')
@@ -252,7 +252,7 @@ private:
 				{
 					if (!memcmp(p, "readonly", sizeof("readonly") - 1))
 					{
-						readonly = true;
+						type = CamoItemReadOnlyProperty;
 					}
 					p++;
 				}
@@ -261,46 +261,34 @@ private:
 		
 		p = ParseSolid(p);
 		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '*') p++;
-		p = ParsePropertySymbol(p, !readonly);
+		p = ParseSymbol(p, type);
 		while (*p && *p++ != ';');
 		return p;
 	}
 	
 	//
-	const char *ParseMethodSymbol(const char *code, bool checkSetter = true)
+	inline const char *ParseMethodSymbol(const char *code, bool checkSetter = true)
 	{
-		const char *p = ParseSymbol(code);
-		if (checkSetter && !memcmp(code, "set", 3) && (p - code > 4) && (p - code < 250))
+		if (checkSetter && !memcmp(code, "set", 3))
 		{
-			char property[250];
-			property[0] = tolower(code[3]);
-			memcpy(property + 1, code + 4, p - code - 3);
-			ParseSymbol(property);
+			char ch = code[3];
+			if (ch >= 'A' && ch <= 'Z')
+			{
+				((char *)code)[3] = tolower(ch);
+				const char *p = ParseSymbol(code + 3, CamoItemProperty);
+				((char *)code)[3] = ch;
+				return p;
+			}
 		}
-		return p;
+		return ParseSymbol(code);
 	}
-	
+		
 	//
-	const char *ParsePropertySymbol(const char *code, bool checkProperty = true)
-	{
-		const char *p = ParseSymbol(code);
-		if (checkProperty && (p > code) && (p - code < 250))
-		{
-			char setter[256];
-			memcpy(setter, "set", 3);
-			setter[3] = toupper(*code);
-			memcpy(setter + 4, code + 1, p - code);
-			ParseSymbol(setter);
-		}
-		return p;
-	}
-	
-	//
-	const char *ParseSymbol(const char *code)
+	const char *ParseSymbol(const char *code, CamoItemType type = CamoItemNormal)
 	{
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
-		symbols.PushSymbol(code, unsigned(p - code));
+		symbols.PushSymbol(code, unsigned(p - code), type);
 		return p;
 	}
 	
