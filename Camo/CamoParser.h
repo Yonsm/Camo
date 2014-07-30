@@ -35,6 +35,7 @@ public:
 		}
 	}
 	
+private:
 	//
 	void ParseDir(const char *dir)
 	{
@@ -112,6 +113,10 @@ public:
 			{
 				p = q;
 			}
+			else if (*p == '{')
+			{
+				p = ParseBlock(p);
+			}
 			else if (!memcmp(p, "@interface", sizeof("@interface") - 1))
 			{
 				p = ParseObject(p);
@@ -126,23 +131,6 @@ public:
 			}
 			else
 			{
-				if (!memcmp(p, "NSClassFromString", sizeof("NSClassFromString") - 1) ||
-					!memcmp(p, "NSSelectorFromString", sizeof("NSSelectorFromString") - 1))
-				{
-					p += ((p[2] == 'C') ? (sizeof("NSClassFromString") - 1) : (sizeof("NSSelectorFromString") - 1));
-					while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '(' || *p == '@') p++;
-					if (*p == '"')
-					{
-#if 0
-						do
-						{
-							p = ParseSymbol(p + 1);
-						}
-						while (*p == ':');	// Multiple arguments selector
-#endif
-						p = ParseUntil(p, '"');
-					}
-				}
 				p++;
 			}
 		}
@@ -162,6 +150,10 @@ public:
 			if (const char *q = ParseCommon(p))
 			{
 				p = q;
+			}
+			else if (*p == '{')
+			{
+				p = ParseBlock(p);
 			}
 			else if (*p == '-' || *p == '+')
 			{
@@ -189,7 +181,7 @@ public:
 	{
 		const char *p = code + 1;
 		p = ParseUntil(p, '\(');
-		p = ParseBlock(p);
+		p = ParseBracket(p);
 		p = ParseBlank(p);
 		const char *symbol = p;
 		const char *first = symbol;
@@ -216,7 +208,7 @@ public:
 					p = ParseBlank(p + 1);
 					if (*p == '(')
 					{
-						p = ParseBlock(p);
+						p = ParseBracket(p);
 						p = ParseBlank(p);
 					}
 					p = ParseSolid(p);
@@ -411,10 +403,10 @@ private:
 	}
 	
 	//  Nest block () [] {}
-	const char *ParseBlock(const char *code)
+	template <char STARTCHAR = '{', char ENDCHAR = '}'> const char *ParseBlock(const char *code)
 	{
-		char start = *code;
-		char end = (start == '(') ? ')' : (start + 2);
+//		char STARTCHAR = *code;
+//		char ENDCHAR = (STARTCHAR == '(') ? ')' : (STARTCHAR + 2);
 		const char *p = code + 1;
 		while (*p)
 		{
@@ -422,20 +414,52 @@ private:
 			{
 				p = q;
 			}
-			else if (*p == start)
-			{
-				p = ParseBlock(p);
-			}
-			else if (*p == end)
+			else if (*p == ENDCHAR)
 			{
 				return p + 1;
 			}
+			else if (*p == STARTCHAR)
+			{
+				p = ParseBlock<STARTCHAR, ENDCHAR>(p);
+			}
 			else
 			{
+				if (STARTCHAR == '{')	// Should be omitted by compiler optimization
+				{
+					p = ParseExclude(p);
+				}
 				p++;
 			}
 		}
 		printf("BROKEN: Block %s\n", code);
+		return p;
+	}
+
+	//
+	inline const char *ParseBracket(const char *code)
+	{
+		return ParseBlock<'(', ')'>(code);
+	}
+	
+	//
+	const char *ParseExclude(const char *code)
+	{
+		const char *p = code;
+		if (!memcmp(p, "NSClassFromString", sizeof("NSClassFromString") - 1) ||
+			!memcmp(p, "NSSelectorFromString", sizeof("NSSelectorFromString") - 1))
+		{
+			p += ((p[2] == 'C') ? (sizeof("NSClassFromString") - 1) : (sizeof("NSSelectorFromString") - 1));
+			while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '(' || *p == '@') p++;
+			if (*p == '"')
+			{
+				do
+				{
+					p = ParseSymbol(p + 1);
+				}
+				while (*p == ':');	// Multiple arguments selector
+				p = ParseUntil(p, '"');
+			}
+		}
 		return p;
 	}
 	
