@@ -164,7 +164,7 @@ public:
 	const char *ParseMethod(const char *code)
 	{
 		const char *p = code + 1;
-		p = ParseUntil(p, '(');
+		p = ParseUntil(p, '\(');
 		p = ParseBlock(p);
 		p = ParseBlank(p);
 		const char *symbol = p;
@@ -189,9 +189,12 @@ public:
 					
 				case ':':
 					ParseMethodSymbol(symbol, first == symbol);
-					p = ParseUntil(p, '(');
-					p = ParseBlock(p);
-					p = ParseBlank(p);
+					p = ParseBlank(p + 1);
+					if (*p == '(')
+					{
+						p = ParseBlock(p);
+						p = ParseBlank(p);
+					}
 					p = ParseSolid(p);
 					p = ParseBlank(p);
 					symbol = p;
@@ -414,7 +417,11 @@ private:
 	//
 	inline const char *ParseUntil(const char *p, char c)
 	{
-		while (*p != c) if (*p) p++; else return p;
+		while (*p != c)
+			if (*p)
+				p++;
+			else
+				return p;
 		return p;
 	}
 	
