@@ -27,7 +27,7 @@
 		24E4D1F71980B33200E79713 /* Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
 		24F211F6198647D800EEA09D /* CamoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CamoParser.h; sourceTree = "<group>"; };
 		24F211F7198647D800EEA09D /* CamoProducer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CamoProducer.h; sourceTree = "<group>"; };
-		24F211F8198647D800EEA09D /* CamoStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CamoStore.h; sourceTree = "<group>"; };
+		24F211F8198647D800EEA09D /* CamoVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CamoVector.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +60,7 @@
 		24E4D1F61980B33200E79713 /* Camo */ = {
 			isa = PBXGroup;
 			children = (
-				24F211F8198647D800EEA09D /* CamoStore.h */,
+				24F211F8198647D800EEA09D /* CamoVector.h */,
 				24F211F6198647D800EEA09D /* CamoParser.h */,
 				24F211F7198647D800EEA09D /* CamoProducer.h */,
 				24E4D1F71980B33200E79713 /* Main.cpp */,

@@ -1,24 +1,24 @@
 
-#import "CamoStore.h"
+#import "CamoVector.h"
 
 //
 class CamoProducer
 {
 public:
 	//
-	CamoProducer(int fd, CamoStore &symbols, size_t begin = 0)
+	CamoProducer(int fd, CamoVector &symbols, unsigned begin = 0)
 	{
 		srand((unsigned)time(NULL));
-		size_t count = symbols.size();
-		for (size_t i = begin; i < count; i++)
+		unsigned count = (unsigned)symbols.size();
+		for (unsigned i = begin; i < count; i++)
 		{
 			write(fd, "#define ", sizeof("#define ") - 1);
 
 			char *symbol = symbols[i];
-			size_t length = strlen(symbol);
+			unsigned length = (unsigned)strlen(symbol);
 			write(fd, symbol, length);
 			
-			for (size_t j = length; j <= symbols.maxLength; j++)
+			for (unsigned j = length; j <= symbols.maxLength; j++)
 			{
 				write(fd, " ", 1);
 			}
@@ -30,14 +30,14 @@ public:
 
 private:
 	//
-	char *NewSymbol(size_t &length)
+	char *NewSymbol(unsigned &length)
 	{
 		const static char newSymbolChars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
 		while (true)
 		{
 			char buffer[256];
 			length = 5 + rand() % 10;
-			for (unsigned int i = 0; i < length; i++)
+			for (unsigned i = 0; i < length; i++)
 			{
 				buffer[i] = newSymbolChars[rand() % (sizeof(newSymbolChars) - 1)];
 			}
@@ -51,5 +51,5 @@ private:
 	}
 	
 private:
-	CamoStore _newSymbols;
+	CamoVector _newSymbols;
 };

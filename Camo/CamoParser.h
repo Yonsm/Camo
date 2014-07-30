@@ -1,5 +1,5 @@
 
-#import "CamoStore.h"
+#import "CamoVector.h"
 #import <string.h>
 #import <fcntl.h>
 #import <dirent.h>
@@ -10,21 +10,28 @@
 class CamoParser
 {
 public:
-	CamoStore symbols;
+	CamoVector symbols;
 	
 public:
 	//
-	void ParsePath(const char *path)
+	void Parse(const char *arg)
 	{
-		struct stat st;
-		stat(path, &st);
-		if (S_ISDIR(st.st_mode))
+		if (*arg == '$')
 		{
-			ParseDir(path);
+			ParseCode(arg + 1);
 		}
 		else
 		{
-			ParseFile(path);
+			struct stat st;
+			stat(arg, &st);
+			if (S_ISDIR(st.st_mode))
+			{
+				ParseDir(arg);
+			}
+			else
+			{
+				ParseFile(arg);
+			}
 		}
 	}
 	
@@ -119,6 +126,23 @@ public:
 			}
 			else
 			{
+				if (!memcmp(p, "NSClassFromString", sizeof("NSClassFromString") - 1) ||
+					!memcmp(p, "NSSelectorFromString", sizeof("NSSelectorFromString") - 1))
+				{
+					p += ((p[2] == 'C') ? (sizeof("NSClassFromString") - 1) : (sizeof("NSSelectorFromString") - 1));
+					while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '(' || *p == '@') p++;
+					if (*p == '"')
+					{
+#if 0
+						do
+						{
+							p = ParseSymbol(p + 1);
+						}
+						while (*p == ':');	// Multiple arguments selector
+#endif
+						p = ParseUntil(p, '"');
+					}
+				}
 				p++;
 			}
 		}
@@ -284,8 +308,10 @@ public:
 	{
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
-		//while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':' && *p != ';' *p != ')') p++;
-		if (p > code) symbols.PushSymbol(code, p - code);
+		if (p > code)	// Check anonymouns argument
+		{
+			symbols.PushSymbol(code, unsigned(p - code));
+		}
 		return p;
 	}
 	
