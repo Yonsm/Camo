@@ -202,7 +202,7 @@ public:
 					break;
 			}
 		}
-		printf("BROKEN: %s\n", code);
+		printf("BROKEN: Method %s\n", code);
 		return p;
 	}
 	
@@ -345,7 +345,7 @@ private:
 				return p + 1;
 			}
 		}
-		printf("BROKEN: %s\n", code);
+		printf("BROKEN: String %s\n", code);
 		return p;
 	}
 	
@@ -361,7 +361,7 @@ private:
 				return p + 1;
 			}
 		}
-		//printf("BROKEN Comment: %s\n", code);
+		//printf("BROKEN: Comment %s\n", code);
 		return p;
 	}
 	
@@ -377,7 +377,7 @@ private:
 				return p + 2;
 			}
 		}
-		printf("BROKEN: %s\n", code);
+		printf("BROKEN: Comments %s\n", code);
 		return p;
 	}
 	
@@ -406,7 +406,7 @@ private:
 				p++;
 			}
 		}
-		printf("BROKEN: %s\n", code);
+		printf("BROKEN: Block %s\n", code);
 		return p;
 	}
 	
