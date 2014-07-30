@@ -43,6 +43,17 @@ public:
 		}
 		write(fd, "\n", 1);
 		
+#ifdef _SUPPORT_ALIGN
+		unsigned align = (stdo ? 0 : items.maxLength);
+#define _ALIGN_ARG		, align
+#define _ALIGN_PARAM	, unsigned align
+#define _ALIGN_LOOP(n)	if (align) for (unsigned j = n; j <= align; j++) write(fd, " ", 1); else write(fd, " ", 1)
+#else
+#define _ALIGN_ARG
+#define _ALIGN_PARAM
+#define _ALIGN_LOOP(n)	write(fd, " ", 1)
+#endif
+		
 		//
 		signed count = 0;
 		srand((unsigned)time(NULL));
@@ -52,59 +63,15 @@ public:
 			CamoItem &item = *items[i];
 			write(fd, _comments[item.type].type, sizeof(_comments[0].type) - 1);
 			
-			write(fd, "#define ", sizeof("#define ") - 1);
-			write(fd, item.symbol, item.length);
-			
-#ifdef _SUPPORT_ALIGN
-			if (!stdo)
-			{
-				for (unsigned j = item.length; j <= items.maxLength; j++)
-				{
-					write(fd, " ", 1);
-				}
-			}
-			else
-#endif
-			{
-				write(fd, " ", 1);
-			}
 			
 			CamoItem &newItem = *NewItem();
-			write(fd, newItem.symbol, newItem.length);
-			
-			write(fd, "\n", 1);
+			ProduceItem(fd, item, newItem _ALIGN_ARG);
 			
 			if (item.type == CamoItemProperty)
 			{
 				count += 2;
+				ProduceSetItem(fd, item, newItem _ALIGN_ARG);
 				
-				write(fd, "/* AUTP */ ", sizeof("/* AUTP */ ") - 1);
-				write(fd, "#define ", sizeof("#define ") - 1);
-				write(fd, "set", sizeof("set") - 1);
-				char ch1 = toupper(item.symbol[0]);
-				write(fd, &ch1, 1);
-				write(fd, item.symbol + 1, item.length - 1);
-				
-#ifdef _SUPPORT_ALIGN
-				if (!stdo)
-				{
-					for (unsigned j = item.length + 3; j <= items.maxLength; j++)
-					{
-						write(fd, " ", 1);
-					}
-				}
-				else
-#endif
-				{
-					write(fd, " ", 1);
-				}
-				
-				write(fd, "set", sizeof("set") - 1);
-				char ch2 = toupper(newItem.symbol[0]);
-				write(fd, &ch2, 1);
-				write(fd, newItem.symbol + 1, newItem.length - 1);
-				
-				write(fd, "\n", 1);
 			}
 			else if (item.type != CamoItemIgnore)
 			{
@@ -119,6 +86,39 @@ public:
 	}
 	
 private:
+	//
+	inline void ProduceItem(int fd, CamoItem &item, CamoItem &newItem _ALIGN_PARAM)
+	{
+		write(fd, "#define ", sizeof("#define ") - 1);
+		write(fd, item.symbol, item.length);
+		
+		_ALIGN_LOOP(item.length);
+		
+		write(fd, newItem.symbol, newItem.length);
+		
+		write(fd, "\n", 1);
+	}
+	
+	//
+	inline void ProduceSetItem(int fd, CamoItem &item, CamoItem &newItem _ALIGN_PARAM)
+	{
+		write(fd, "/* AUTP */ ", sizeof("/* AUTP */ ") - 1);
+		write(fd, "#define ", sizeof("#define ") - 1);
+		write(fd, "set", sizeof("set") - 1);
+		char ch1 = toupper(item.symbol[0]);
+		write(fd, &ch1, 1);
+		write(fd, item.symbol + 1, item.length - 1);
+		
+		_ALIGN_LOOP(item.length + 3);
+		
+		write(fd, "set", sizeof("set") - 1);
+		char ch2 = toupper(newItem.symbol[0]);
+		write(fd, &ch2, 1);
+		write(fd, newItem.symbol + 1, newItem.length - 1);
+		
+		write(fd, "\n", 1);
+	}
+	
 	//
 	CamoItem *NewItem()
 	{
