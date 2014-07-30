@@ -7,18 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		246804AB19897F3A00417660 /* Camo in CopyFiles */ = {isa = PBXBuildFile; fileRef = 24E4D1F41980B33200E79713 /* Camo */; };
 		24E4D1F81980B33200E79713 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24E4D1F71980B33200E79713 /* Main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		24E4D1F21980B33200E79713 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
+			buildActionMask = 12;
+			dstPath = "$(SRCROOT)/Release";
 			dstSubfolderSpec = 0;
 			files = (
+				246804AB19897F3A00417660 /* Camo in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
