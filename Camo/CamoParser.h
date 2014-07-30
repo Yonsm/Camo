@@ -1,17 +1,14 @@
 
-#include "CamoStore.h"
-#include <string.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#import "CamoStore.h"
+#import <string.h>
+#import <fcntl.h>
+#import <dirent.h>
+#import <unistd.h>
+#import <sys/stat.h>
 
 //
-class CamoParser
+class CamoParser : public CamoStore
 {
-public:
-	CamoStore _store;
-	
 public:
 	//
 	void ParseDir(const char *dir)
@@ -196,34 +193,39 @@ public:
 	{
 		bool readonly = false;
 		const char *p = code + sizeof("@propterty") - 1;
-		while (*p)
+		p = ParseBlank(p);
+		if (*p == '(')
 		{
-			if (*p == ')')
+			p++;
+			while (*p)
 			{
-				p = ParseBlank(p + 1);
-				p = ParseSolid(p);
-				while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '*') p++;
-				p = ParsePropertySymbol(p, !readonly);
-				while (*p && *p++ != ';');
-				return p;
-			}
-			else if (!memcmp(p, "getter", sizeof("getter") - 1) || !memcmp(p, "setter", sizeof("setter") - 1))
-			{
-				p += sizeof("getter") - 1;
-				p = ParseUntil(p, '=');
-				p = ParseBlank(p + 1);
-				p = ParseSymbol(p);
-			}
-			else
-			{
-				if (!memcmp(p, "readonly", sizeof("readonly") - 1))
+				if (*p == ')')
 				{
-					readonly = true;
+					p = ParseBlank(p + 1);
+					break;
 				}
-				p++;
+				else if (!memcmp(p, "getter", sizeof("getter") - 1) || !memcmp(p, "setter", sizeof("setter") - 1))
+				{
+					p += sizeof("getter") - 1;
+					p = ParseUntil(p, '=');
+					p = ParseBlank(p + 1);
+					p = ParseSymbol(p);
+				}
+				else
+				{
+					if (!memcmp(p, "readonly", sizeof("readonly") - 1))
+					{
+						readonly = true;
+					}
+					p++;
+				}
 			}
 		}
-		fprintf(stderr, "BROKEN Property: %s\n", code);
+		
+		p = ParseSolid(p);
+		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '*') p++;
+		p = ParsePropertySymbol(p, !readonly);
+		while (*p && *p++ != ';');
 		return p;
 	}
 	
@@ -262,7 +264,7 @@ public:
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
 		//while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':' && *p != ';' *p != ')') p++;
-		if (p > code) _store.PushSymbol(code, p - code);
+		if (p > code) PushSymbol(code, p - code);
 		return p;
 	}
 	
@@ -341,7 +343,7 @@ private:
 				return p + 1;
 			}
 		}
-		fprintf(stderr, "BROKEN Comment: %s\n", code);
+		//fprintf(stderr, "BROKEN Comment: %s\n", code);
 		return p;
 	}
 	

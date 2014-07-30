@@ -1,19 +1,15 @@
 
-#include <stdlib.h>
-#include <vector>
+#import <stdlib.h>
+#import <vector>
 
 //
-class CamoStore
+class CamoStore : public std::vector<char *>
 {
-public:
-	//
-	std::vector<char *> _symbols;
-	
 public:
 	//
 	~CamoStore()
 	{
-		for (std::vector<char *>::iterator it = _symbols.begin(); it != _symbols.end(); ++it)
+		for (CamoStore::iterator it = begin(); it != end(); ++it)
 		{
 			free(*it);
 		}
@@ -23,7 +19,7 @@ public:
 	//
 	bool PushSymbol(const char *code, size_t size)
 	{
-		for (std::vector<char *>::iterator it = _symbols.begin(); it != _symbols.end(); ++it)
+		for (CamoStore::iterator it = begin(); it != end(); ++it)
 		{
 			if (!strncmp(*it, code, size))
 			{
@@ -38,10 +34,8 @@ public:
 		char *symbol = (char *)malloc(size + 1);
 		memcpy(symbol, code, size);
 		symbol[size] = 0;
-		
-		puts(symbol);
-		
-		_symbols.push_back(symbol);
+		//puts(symbol);
+		push_back(symbol);
 		return true;
 	}
 };
