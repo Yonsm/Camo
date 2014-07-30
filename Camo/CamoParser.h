@@ -61,7 +61,7 @@ public:
 		}
 		else
 		{
-			printf("ERROR Dir: %s\n", dir);
+			printf("ERROR: Could not open dir %s\n", dir);
 		}
 	}
 	
@@ -71,7 +71,7 @@ public:
 		int fd = open(file, O_RDONLY);
 		if (fd)
 		{
-			printf("PARSE File: %s\n", file);
+			printf("PARSING: %s\n", file);
 			struct stat stat;
 			fstat(fd, &stat);
 			
@@ -85,13 +85,13 @@ public:
 			}
 			else
 			{
-				printf("ERROR Memory: %s\n", file);
+				printf("ERROR: Could not allocate memory for %s\n", file);
 			}
 			close(fd);
 		}
 		else
 		{
-			printf("ERROR File: %s\n", file);
+			printf("ERROR: Clould not open file %s\n", file);
 		}
 	}
 	
@@ -156,7 +156,7 @@ public:
 				p++;
 			}
 		}
-		printf("BROKEN Object: %s\n", code);
+		printf("BROKEN: Object %s\n", code);
 		return p;
 	}
 	
@@ -202,7 +202,7 @@ public:
 					break;
 			}
 		}
-		printf("BROKEN Method: %s\n", code);
+		printf("BROKEN: %s\n", code);
 		return p;
 	}
 	
@@ -345,7 +345,7 @@ private:
 				return p + 1;
 			}
 		}
-		printf("BROKEN String: %s\n", code);
+		printf("BROKEN: %s\n", code);
 		return p;
 	}
 	
@@ -377,7 +377,7 @@ private:
 				return p + 2;
 			}
 		}
-		printf("BROKEN Comments: %s\n", code);
+		printf("BROKEN: %s\n", code);
 		return p;
 	}
 	
@@ -406,7 +406,7 @@ private:
 				p++;
 			}
 		}
-		printf("BROKEN Block: %s\n", code);
+		printf("BROKEN: %s\n", code);
 		return p;
 	}
 	
