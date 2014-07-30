@@ -2,7 +2,6 @@
 Camo Preprocessor
 ======
 
-<pre>
 Camo Preprocessor 1.0.3
 Symbol Confusion for Objective C/C++
 Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.
@@ -20,5 +19,3 @@ Example: Camo $ ./Sources
 Example: Camo ./CamoPrefix.h ./Sources -
 
 Example: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
-
-</pre>
