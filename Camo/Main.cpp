@@ -6,20 +6,21 @@
 //
 int main(int argc, char * argv[])
 {
-	puts("Camo Preprocessor 1.0.2\n"
+	puts("Camo Preprocessor 1.0.3\n"
 		 "Symbol Confusion for Objective C/C++\n"
 		 "Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.\n");
 	
 	if (argc < 3)
 	{
-		printf("Usage: %s <OutFile|$> [-]<File1|Dir1> [-]<File2|Dir2> [-] ...\n"
-			   "       OutFile     Output symbols redifinition to file\n"
-			   "       $           Output symbols redifinition to stdout\n"
-			   "       File|Dir    Include symbols from file or dir\n"
-			   "       -File|-Dir  Exclude symbols from file or dir\n"
-			   "       -           Exclude symbols from Xcode iPhone SDK\n\n"
-			   "Example: %s ./CamoPrefix.h . -\n\n",
-			   argv[0], argv[0]);
+		puts("Usage: %s <OutFile|$> [-]<File1|Dir1> [-]<File2|Dir2> [-] ...\n\n"
+			 "       OutFile     Output symbols redifinition to file\n"
+			 "       $           Output symbols redifinition to stdout\n"
+			 "       File|Dir    Include symbols from file or dir\n"
+			 "       -File|-Dir  Exclude symbols from file or dir\n"
+			 "       -           Exclude symbols from Xcode iPhone SDK\n\n"
+			 "Example: Camo $ ./Sources\n\n"
+			 "Example: Camo ./CamoPrefix.h ./Sources -\n\n"
+			 "Example: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -\n");
 		return EXIT_FAILURE;
 	}
 	
@@ -40,7 +41,7 @@ int main(int argc, char * argv[])
 	if (exclude)
 	{
 		printf("EXCLUDE: %d symbols\n\n", (int)exclude);
-
+		
 		parser.symbols.maxLength = 0; // Reset
 	}
 	
@@ -57,7 +58,7 @@ int main(int argc, char * argv[])
 	if (total > exclude)
 	{
 		printf("INCLUDE: %d symbols\n\n", (int)(total - exclude));
-	
+		
 		if (argv[1][0] == '$' && argv[1][1] == 0)
 		{
 			CamoProducer producer(fileno(stdout), parser.symbols, exclude);
