@@ -28,7 +28,7 @@ EXAMPLE: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
 
 EXAMPLE: Camo $ "@interface MyObj - (void)myMethod; @property BOOL myProp; @end"
 
-IMPORTANT: Check the output carefully, especially under the complex circumstances.
+IMPORTANT: Check the output carefully, especially under the complex circumstance.
 </pre>
 
 Download Binary: [Camo for Mac OS X 10.9+](https://raw.githubusercontent.com/Yonsm/Camo/master/Release/Camo)
