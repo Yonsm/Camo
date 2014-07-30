@@ -8,15 +8,26 @@ public:
 	//
 	CamoProducer(int fd, CamoVector &items, unsigned begin = 0)
 	{
+		const static char *_comments[] =
+		{
+			"/* IGNO*///",
+			"/* METH */ ",
+			
+			"/* PROP */ ",
+			"/* REAP */ ",
+			"/* SETP */ ",
+			"/* GETP */ ",
+
+			"/* PROT */ ",
+			"/* INTE */ ",
+			"/* IMPL */ ",
+		};
 		srand((unsigned)time(NULL));
 		unsigned count = (unsigned)items.size();
 		for (unsigned i = begin; i < count; i++)
 		{
 			CamoItem &item = *items[i];
-			if (item.type == CamoItemIgnore)
-			{
-				write(fd, "//", 2);
-			}
+			write(fd, _comments[item.type], sizeof("/* IMPL */ ") - 1);
 			
 			write(fd, "#define ", sizeof("#define ") - 1);
 			write(fd, item.symbol, item.length);
@@ -33,13 +44,14 @@ public:
 			
 			if (item.type == CamoItemProperty)
 			{
+				write(fd, "/* AUTP */ ", sizeof("/* AUTP */ ") - 1);
 				write(fd, "#define ", sizeof("#define ") - 1);
 				write(fd, "set", sizeof("set") - 1);
 				char ch1 = toupper(item.symbol[0]);
 				write(fd, &ch1, 1);
 				write(fd, item.symbol + 1, item.length - 1);
 				
-				for (unsigned j = item.length; j <= items.maxLength; j++)
+				for (unsigned j = item.length + 3; j <= items.maxLength; j++)
 				{
 					write(fd, " ", 1);
 				}

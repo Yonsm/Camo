@@ -5,10 +5,17 @@
 //
 enum CamoItemType
 {
-	CamoItemNormal,
 	CamoItemIgnore,
+	CamoItemMethod,
+
 	CamoItemProperty,
-	CamoItemReadOnlyProperty,
+	CamoItemReadOnly,
+	CamoItemSetter,
+	CamoItemGetter,
+	
+	CamoItemProtocol,
+	CamoItemInterface,
+	CamoItemImplementation,
 };
 
 //
@@ -42,7 +49,7 @@ public:
 	
 public:
 	//
-	CamoItem *PushSymbol(const char *symbol, unsigned length, CamoItemType type = CamoItemNormal)
+	CamoItem *PushSymbol(const char *symbol, unsigned length, CamoItemType type = CamoItemIgnore)
 	{
 		if (length == 0)
 		{
@@ -52,17 +59,12 @@ public:
 		// Skip duplicate
 		for (CamoVector::iterator it = begin(); it != end(); ++it)
 		{
-			if ((length == (*it)->length) && !memcmp(symbol, (*it)->symbol, length))
+			CamoItem &item = **it;
+			if ((length == item.length) && !memcmp(symbol, item.symbol, length))
 			{
-				(*it)->type = type;
+				item.type = type;
 				return NULL;
 			}
-		}
-		
-		//
-		if (maxLength < length)
-		{
-			maxLength = length;
 		}
 		
 		CamoItem *item = (CamoItem *)malloc(sizeof(CamoItem) + length);
@@ -70,6 +72,17 @@ public:
 		item->length = length;
 		memcpy(item->symbol, symbol, length);
 		push_back(item);
+		
+		//
+		if (type == CamoItemProperty)
+		{
+			length += 3;
+		}
+		if (maxLength < length)
+		{
+			maxLength = length;
+		}
+		
 		return item;
 	}
 };

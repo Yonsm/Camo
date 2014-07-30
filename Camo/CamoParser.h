@@ -119,15 +119,15 @@ private:
 			}
 			else if (!memcmp(p, "@interface", sizeof("@interface") - 1))
 			{
-				p = ParseObject(p);
+				p = ParseObject(p, CamoItemInterface);
 			}
 			else if (!memcmp(p, "@protocol", sizeof("@protocol") - 1))
 			{
-				p = ParseObject(p);
+				p = ParseObject(p, CamoItemProtocol);
 			}
 			else if (!memcmp(p, "@implementation", sizeof("@implementation") - 1))
 			{
-				p = ParseObject(p);
+				p = ParseObject(p, CamoItemImplementation);
 			}
 			else
 			{
@@ -137,12 +137,12 @@ private:
 	}
 	
 	// @interface @implementation @protocol
-	const char *ParseObject(const char *code)
+	const char *ParseObject(const char *code, CamoItemType type)
 	{
 		const char *p = code;
 		p = ParseSolid(p);
 		p = ParseBlank(p);
-		p = ParseSymbol(p);
+		p = ParseSymbol(p, type);
 		PrintOut("OBJECT:", code, p);
 		
 		while (*p)
@@ -243,16 +243,17 @@ private:
 				}
 				else if (!memcmp(p, "getter", sizeof("getter") - 1) || !memcmp(p, "setter", sizeof("setter") - 1))
 				{
+					CamoItemType type = (*p == 'g') ? CamoItemGetter : CamoItemSetter;
 					p += sizeof("getter") - 1;
 					p = ParseUntil(p, '=');
 					p = ParseBlank(p + 1);
-					p = ParseSymbol(p);
+					p = ParseSymbol(p, type);
 				}
 				else
 				{
 					if (!memcmp(p, "readonly", sizeof("readonly") - 1))
 					{
-						type = CamoItemReadOnlyProperty;
+						type = CamoItemReadOnly;
 					}
 					p++;
 				}
@@ -280,11 +281,11 @@ private:
 				return p;
 			}
 		}
-		return ParseSymbol(code);
+		return ParseSymbol(code, CamoItemMethod);
 	}
 		
 	//
-	const char *ParseSymbol(const char *code, CamoItemType type = CamoItemNormal)
+	const char *ParseSymbol(const char *code, CamoItemType type/* = CamoItemNormal*/)
 	{
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
