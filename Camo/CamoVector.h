@@ -2,6 +2,8 @@
 #import <stdlib.h>
 #import <vector>
 
+//#define _SUPPORT_ALIGN
+
 //
 enum CamoItemType
 {
@@ -30,13 +32,15 @@ struct CamoItem
 class CamoVector : public std::vector<CamoItem *>
 {
 public:
+#ifdef _SUPPORT_ALIGN
 	unsigned maxLength;
-	
-public:
+
+	//
 	inline CamoVector()
 	{
 		maxLength = 0;
 	}
+#endif
 	
 	//
 	inline ~CamoVector()
@@ -74,6 +78,7 @@ public:
 		push_back(item);
 		
 		//
+#ifdef _SUPPORT_ALIGN
 		if (type == CamoItemProperty)
 		{
 			length += 3;
@@ -82,6 +87,7 @@ public:
 		{
 			maxLength = length;
 		}
+#endif
 		
 		return item;
 	}

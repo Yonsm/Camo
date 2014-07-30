@@ -1,12 +1,11 @@
 
 #import "CamoParser.h"
 #import "CamoProducer.h"
-#import <errno.h>
 
 //
 int main(int argc, char * argv[])
 {
-	puts("Camo Preprocessor 1.0.5\n"
+	puts("Camo Preprocessor 1.0.6.0731\n"
 		 "Symbol Confusion for Objective C/C++\n"
 		 "Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.\n");
 	
@@ -45,7 +44,9 @@ int main(int argc, char * argv[])
 	{
 		printf("EXCLUDE: %d symbols\n\n", (int)exclude);
 		
+#ifdef _SUPPORT_ALIGN
 		parser.symbols.maxLength = 0; // Reset
+#endif
 	}
 	
 	for (int i = 2; i < argc; i++)
@@ -62,23 +63,9 @@ int main(int argc, char * argv[])
 	{
 		printf("INCLUDE: %d symbols\n\n", (int)(total - exclude));
 		
-		if (argv[1][0] == '$' && argv[1][1] == 0)
-		{
-			CamoProducer producer(fileno(stdout), parser.symbols, exclude);
-		}
-		else
-		{
-			int fd = creat(argv[1], S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-			if (fd == -1)
-			{
-				printf("ERROR: Could not create %s\n\n", argv[1]);
-				return errno;
-			}
-			
-			CamoProducer producer(fd, parser.symbols, exclude);
-			close(fd);
-			printf("PRODUCE: %s\n\n", argv[1]);
-		}
+		CamoProducer producer;
+		
+		return producer.Produce(argv[1], parser.symbols, exclude);
 	}
 	else
 	{
