@@ -6,23 +6,29 @@ Camo Preprocessor 1.0.6.0731
 Symbol Confusion for Objective C/C++
 Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.
 
-Usage: Camo &lt;OutFile|$&gt; [-]&lt;File1|Dir1|@Code&gt; [-]&lt;File2|Dir2|@Code&gt; [-] ...
+USAGE: Camo [OutFile|$] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ...
 
-       OutFile     Output symbols redifinition to file
-       $           Output symbols redifinition to stdout
-       File|Dir    Include symbols from file or dir
-       -File|-Dir  Exclude symbols from file or dir
-       @Code       Include symbols from input code
-       -@Code      Exclude symbols from input code
-       -           Exclude symbols from Xcode iPhone SDK
+       OutFile     Output symbols to file
+       $           Output symbols to stdout
 
-Example: Camo $ ./Sources
+       Dir         Include symbols from dir
+       File        Include symbols from file
+       @Code       Include symbols from code
 
-Example: Camo ./CamoPrefix.h ./Sources -
+       -Dir        Exclude symbols from dir
+       -File       Exclude symbols from file
+       -@Code      Exclude symbols from code
+       -           Exclude symbols from iPhone SDK
 
-Example: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
+EXAMPLE: Camo $ ./Sources
 
-Example: Camo $ "@interface MyObj - (void)myMethod; @property BOOL myProp; @end"
+EXAMPLE: Camo ./CamoPrefix.h ./Sources -
+
+EXAMPLE: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
+
+EXAMPLE: Camo $ "@interface MyObj - (void)myMethod; @property BOOL myProp; @end"
+
+IMPORTANT: Check the output carefully, especially under the complex circumstances.
 </pre>
 
 Download Binary: [Camo for Mac OS X 10.9+](https://raw.githubusercontent.com/Yonsm/Camo/master/Release/Camo)
