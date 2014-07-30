@@ -16,9 +16,9 @@ public:
 	//
 	void Parse(const char *arg)
 	{
-		if (*arg == '$')
+		if (*arg == '@')
 		{
-			ParseCode(arg + 1);
+			ParseCode(arg);
 		}
 		else
 		{
