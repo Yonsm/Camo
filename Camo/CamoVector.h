@@ -3,7 +3,23 @@
 #import <vector>
 
 //
-class CamoVector : public std::vector<char *>
+enum CamoItemType
+{
+	CamoItemNormal,
+	CamoItemIgnore,
+	CamoItemProperty,
+};
+
+//
+struct CamoItem
+{
+	CamoItemType type;
+	unsigned length;
+	char symbol[];
+};
+
+//
+class CamoVector : public std::vector<CamoItem *>
 {
 public:
 	unsigned maxLength;
@@ -25,24 +41,20 @@ public:
 	
 public:
 	//
-	char *PushSymbol(const char *string, unsigned length)
+	CamoItem *PushSymbol(const char *symbol, unsigned length, CamoItemType type = CamoItemNormal)
 	{
+		if (length == 0)
+		{
+			return NULL;
+		}
+		
 		// Skip duplicate
 		for (CamoVector::iterator it = begin(); it != end(); ++it)
 		{
-			const char *p1 = *it;
-			const char *p2 = string;
-			for (unsigned i = 0; ; i++)
+			if ((length == (*it)->length) && !memcmp(symbol, (*it)->symbol, length))
 			{
-				if (i == length)
-				{
-					if (p1[i] == 0) return NULL;
-					else break;
-				}
-				else if (p1[i] != p2[i])
-				{
-					break;
-				}
+				(*it)->type = type;
+				return NULL;
 			}
 		}
 		
@@ -52,10 +64,11 @@ public:
 			maxLength = length;
 		}
 		
-		char *symbol = (char *)malloc(length + 1);
-		memcpy(symbol, string, length);
-		symbol[length] = 0;
-		push_back(symbol);
-		return symbol;
+		CamoItem *item = (CamoItem *)malloc(sizeof(CamoItem) + length);
+		item->type = type;
+		item->length = length;
+		memcpy(item->symbol, symbol, length);
+		push_back(item);
+		return item;
 	}
 };

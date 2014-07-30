@@ -181,7 +181,7 @@ private:
 	{
 		const char *p = code + 1;
 		p = ParseUntil(p, '\(');
-		p = ParseBracket(p);
+		p = ParseBlock<'(', ')'>(p);
 		p = ParseBlank(p);
 		const char *symbol = p;
 		const char *first = symbol;
@@ -208,7 +208,7 @@ private:
 					p = ParseBlank(p + 1);
 					if (*p == '(')
 					{
-						p = ParseBracket(p);
+						p = ParseBlock<'(', ')'>(p);
 						p = ParseBlank(p);
 					}
 					p = ParseSolid(p);
@@ -300,10 +300,7 @@ private:
 	{
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
-		if (p > code)	// Check anonymouns argument
-		{
-			symbols.PushSymbol(code, unsigned(p - code));
-		}
+		symbols.PushSymbol(code, unsigned(p - code));
 		return p;
 	}
 	
@@ -405,8 +402,8 @@ private:
 	//  Nest block () [] {}
 	template <char STARTCHAR = '{', char ENDCHAR = '}'> const char *ParseBlock(const char *code)
 	{
-//		char STARTCHAR = *code;
-//		char ENDCHAR = (STARTCHAR == '(') ? ')' : (STARTCHAR + 2);
+		//		char STARTCHAR = *code;
+		//		char ENDCHAR = (STARTCHAR == '(') ? ')' : (STARTCHAR + 2);
 		const char *p = code + 1;
 		while (*p)
 		{
@@ -426,7 +423,7 @@ private:
 			{
 				if (STARTCHAR == '{')	// Should be omitted by compiler optimization
 				{
-					p = ParseExclude(p);
+					p = ParseIgnore(p);
 				}
 				p++;
 			}
@@ -434,15 +431,9 @@ private:
 		printf("BROKEN: Block %s\n", code);
 		return p;
 	}
-
-	//
-	inline const char *ParseBracket(const char *code)
-	{
-		return ParseBlock<'(', ')'>(code);
-	}
 	
 	//
-	const char *ParseExclude(const char *code)
+	const char *ParseIgnore(const char *code)
 	{
 		const char *p = code;
 		if (!memcmp(p, "NSClassFromString", sizeof("NSClassFromString") - 1) ||
@@ -452,12 +443,20 @@ private:
 			while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '(' || *p == '@') p++;
 			if (*p == '"')
 			{
-				do
+				for (const char *symbol = ++p; *p; p++)	// Multiple arguments selector
 				{
-					p = ParseSymbol(p + 1);
+					if (*p == ':')
+					{
+						symbols.PushSymbol(symbol, unsigned(p - symbol), CamoItemIgnore);
+						symbol = p + 1;
+					}
+					else if (*p == '"')
+					{
+						symbols.PushSymbol(symbol, unsigned(p - symbol), CamoItemIgnore);
+						p++;
+						break;
+					}
 				}
-				while (*p == ':');	// Multiple arguments selector
-				p = ParseUntil(p, '"');
 			}
 		}
 		return p;
@@ -493,8 +492,6 @@ private:
 	//
 	inline void PrintOut(const char *type, const char *code, const char *end)
 	{
-		//puts(type);
-		//fwrite(code, end - code, 1, stdout);
-		//puts("\n");
+		//puts(type); fwrite(code, end - code, 1, stdout); puts("\n");
 	}
 };
