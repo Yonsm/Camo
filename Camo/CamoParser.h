@@ -7,9 +7,27 @@
 #import <sys/stat.h>
 
 //
-class CamoParser : public CamoStore
+class CamoParser
 {
 public:
+	CamoStore symbols;
+	
+public:
+	//
+	void ParsePath(const char *path)
+	{
+		struct stat st;
+		stat(path, &st);
+		if (S_ISDIR(st.st_mode))
+		{
+			ParseDir(path);
+		}
+		else
+		{
+			ParseFile(path);
+		}
+	}
+	
 	//
 	void ParseDir(const char *dir)
 	{
@@ -21,7 +39,7 @@ public:
 			char *subpath = path + strlen(path);
 			*subpath++ = '/';
 			
-			//fprintf(stderr, "INFO Dir: %s\n", dir);
+			//printf("PARSE Dir: %s\n", dir);
 			struct dirent *ent;
 			while ((ent = readdir(dp)))
 			{
@@ -43,7 +61,7 @@ public:
 		}
 		else
 		{
-			fprintf(stderr, "ERROR Dir: %s\n", dir);
+			printf("ERROR Dir: %s\n", dir);
 		}
 	}
 	
@@ -53,7 +71,7 @@ public:
 		int fd = open(file, O_RDONLY);
 		if (fd)
 		{
-			//fprintf(stderr, "INFO File: %s\n", file);
+			printf("PARSE File: %s\n", file);
 			struct stat stat;
 			fstat(fd, &stat);
 			
@@ -67,16 +85,16 @@ public:
 			}
 			else
 			{
-				fprintf(stderr, "ERROR Memory: %s\n", file);
+				printf("ERROR Memory: %s\n", file);
 			}
 			close(fd);
 		}
 		else
 		{
-			fprintf(stderr, "ERROR File: %s\n", file);
+			printf("ERROR File: %s\n", file);
 		}
 	}
-	
+
 	//
 	void ParseCode(const char *code)
 	{
@@ -113,8 +131,8 @@ public:
 		p = ParseSolid(p);
 		p = ParseBlank(p);
 		p = ParseSymbol(p);
-		PrintOut("Object:", code, p - code);
-		
+		PrintOut("OBJECT:", code, p);
+
 		while (*p)
 		{
 			if (const char *q = ParseCommon(p))
@@ -138,7 +156,7 @@ public:
 				p++;
 			}
 		}
-		fprintf(stderr, "BROKEN Object: %s\n", code);
+		printf("BROKEN Object: %s\n", code);
 		return p;
 	}
 	
@@ -161,12 +179,12 @@ public:
 			{
 				case ';':
 					if (first == symbol) ParseMethodSymbol(symbol);
-					PrintOut("Declaration:", code, p - code);
+					PrintOut("DECLARATION:", code, p);
 					return p + 1;
 					
 				case '{':
 					if (first == symbol) ParseMethodSymbol(symbol);
-					PrintOut("Implentation:", code, p - code);
+					PrintOut("IMPLEMENTATION:", code, p);
 					return ParseBlock(p);
 					
 				case ':':
@@ -184,7 +202,7 @@ public:
 					break;
 			}
 		}
-		fprintf(stderr, "BROKEN Method: %s\n", code);
+		printf("BROKEN Method: %s\n", code);
 		return p;
 	}
 	
@@ -264,7 +282,7 @@ public:
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
 		//while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != '<' && *p != '{' && *p != ':' && *p != ';' *p != ')') p++;
-		if (p > code) PushSymbol(code, p - code);
+		if (p > code) symbols.PushSymbol(code, p - code);
 		return p;
 	}
 	
@@ -323,11 +341,11 @@ private:
 			}
 			else if (*p == ch)
 			{
-				//PrintOut("String:", code, p + 1 - code);
+				PrintOut("STRING:", code, p + 1);
 				return p + 1;
 			}
 		}
-		fprintf(stderr, "BROKEN String: %s\n", code);
+		printf("BROKEN String: %s\n", code);
 		return p;
 	}
 	
@@ -339,11 +357,11 @@ private:
 		{
 			if (*p == '\r' || *p == '\n')
 			{
-				//PrintOut("Comment:", code, p + 1 - code);
+				//PrintOut("COMMENT:", code, p + 1);
 				return p + 1;
 			}
 		}
-		//fprintf(stderr, "BROKEN Comment: %s\n", code);
+		//printf("BROKEN Comment: %s\n", code);
 		return p;
 	}
 	
@@ -355,11 +373,11 @@ private:
 		{
 			if (*p == '*' && p[1] == '/')
 			{
-				//PrintOut("Comments:", code, p + 2 - code);
+				//PrintOut("COMMENTS:", code, p + 2);
 				return p + 2;
 			}
 		}
-		fprintf(stderr, "BROKEN Comments: %s\n", code);
+		printf("BROKEN Comments: %s\n", code);
 		return p;
 	}
 	
@@ -388,7 +406,7 @@ private:
 				p++;
 			}
 		}
-		fprintf(stderr, "BROKEN Block: %s\n", code);
+		printf("BROKEN Block: %s\n", code);
 		return p;
 	}
 	
@@ -416,10 +434,10 @@ private:
 	
 private:
 	//
-	inline void PrintOut(const char *type, const char *code, size_t length)
+	inline void PrintOut(const char *type, const char *code, const char *end)
 	{
-		//puts(type);
-		//fwrite(code, length, 1, stdout);
-		//puts("\n");
+//		puts(type);
+//		fwrite(code, end - code, 1, stdout);
+//		puts("\n");
 	}
 };

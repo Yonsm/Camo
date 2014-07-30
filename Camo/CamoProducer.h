@@ -6,11 +6,11 @@ class CamoProducer
 {
 public:
 	//
-	void ProduceNewSymbols(int fd, CamoStore &symbols, unsigned int begin = 0)
+	CamoProducer(int fd, CamoStore &symbols, size_t begin = 0)
 	{
 		srand((unsigned)time(NULL));
 		size_t count = symbols.size();
-		for (unsigned int i = begin; i < count; i++)
+		for (size_t i = begin; i < count; i++)
 		{
 			write(fd, "#define ", sizeof("#define ") - 1);
 
@@ -18,7 +18,7 @@ public:
 			size_t length = strlen(symbol);
 			write(fd, symbol, length);
 			
-			for (size_t i = length; i <= symbols.maxLength; i++)
+			for (size_t j = length; j <= symbols.maxLength; j++)
 			{
 				write(fd, " ", 1);
 			}
