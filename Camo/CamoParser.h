@@ -69,7 +69,7 @@ public:
 	void ParseFile(const char *file)
 	{
 		int fd = open(file, O_RDONLY);
-		if (fd)
+		if (fd != -1)
 		{
 			printf("PARSING: %s\n", file);
 			struct stat stat;
