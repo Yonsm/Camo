@@ -5,9 +5,17 @@
 //
 class CamoStore : public std::vector<char *>
 {
+//public:
+//	size_t maxLength;
+	
 public:
+//	inline CamoStore()
+//	{
+//		maxLength = 0;
+//	}
+	
 	//
-	~CamoStore()
+	inline ~CamoStore()
 	{
 		for (CamoStore::iterator it = begin(); it != end(); ++it)
 		{
@@ -17,25 +25,26 @@ public:
 	
 public:
 	//
-	bool PushSymbol(const char *code, size_t size)
+	char *PushSymbol(const char *string, size_t length)
 	{
 		for (CamoStore::iterator it = begin(); it != end(); ++it)
 		{
-			if (!strncmp(*it, code, size))
+			if (!strncmp(*it, string, length))
 			{
-				return false;
+				return NULL;
 			}
 		}
 		
-		if (code[0] == '<')
-		{
-			return false;
-		}
-		char *symbol = (char *)malloc(size + 1);
-		memcpy(symbol, code, size);
-		symbol[size] = 0;
+//		if (maxLength < length)
+//		{
+//			maxLength = length;
+//		}
+		
+		char *symbol = (char *)malloc(length + 1);
+		memcpy(symbol, string, length);
+		symbol[length] = 0;
 		//puts(symbol);
 		push_back(symbol);
-		return true;
+		return symbol;
 	}
 };

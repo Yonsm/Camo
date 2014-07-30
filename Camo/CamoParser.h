@@ -416,10 +416,10 @@ private:
 	
 private:
 	//
-	inline void PrintOut(const char *type, const char *code, size_t size)
+	inline void PrintOut(const char *type, const char *code, size_t length)
 	{
 		//puts(type);
-		//fwrite(code, size, 1, stdout);
+		//fwrite(code, length, 1, stdout);
 		//puts("\n");
 	}
 };
