@@ -6,7 +6,7 @@
 #import <unistd.h>
 #import <sys/stat.h>
 
-#ifdef _SUPPORT_UTF_16LE
+#ifdef _SUPPORT_UTF16
 #import <string>
 #import <codecvt>
 #include <fstream>
