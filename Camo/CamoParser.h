@@ -291,10 +291,6 @@ private:
 			}
 			else switch (*p)
 			{
-				case '(':
-					p = ParseBlock<'('>(p);
-					break;
-
 				case '<':
 					p = ParseBlock<'<'>(p);
 					break;
@@ -302,19 +298,21 @@ private:
 				case '{':
 					p = ParseBlock(p);
 					break;
-					
+
 				case ' ':
 				case '\t':
 				case '\r':
 				case '\n':
 				case '*':
 				case '&':
+				case '(':
+				case '^':
 					p++;
 					break;
 					
 				default:
 					p = ParseSymbol(p, type);
-					while (*p && *p++ != ';');
+					p = ParseUntil(p, ';');
 					return p;
 			}
 		}
@@ -352,25 +350,15 @@ private:
 	inline const char *ParseCommon(const char *code)
 	{
 		if (*code == '#')
-		{
 			return ParsePreprocessor(code);
-		}
 		else if (*code == '\'' || *code == '\"')
-		{
 			return ParseString(code);
-		}
 		else if (*code == '/' && code[1] == '/')
-		{
 			return ParseComment(code);
-		}
 		else if (*code == '/' && code[1] == '*')
-		{
 			return ParseComments(code);
-		}
 		else if (*code == '\\')
-		{
 			return code + 2;
-		}
 		return NULL;
 	}
 	
@@ -520,24 +508,44 @@ private:
 	inline const char *ParseUntil(const char *p, char c)
 	{
 		while (*p != c)
-			if (*p)
+		{
+			if (const char *q = ParseCommon(p))
+				p = q;
+			else if (*p)
 				p++;
 			else
 				return p;
+		}
 		return p;
 	}
 	
 	//
 	inline const char *ParseBlank(const char *p)
 	{
-		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
+		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n')
+		{
+			if (*p == '/' && p[1] == '/')
+				p = ParseComments(p);
+			else if (*p == '/' && p[1] == '*')
+				p = ParseComments(p);
+			else if (*p == '\\')
+				p += 2;
+			else
+				p++;
+		}
 		return p;
 	}
 	
 	//
 	inline const char *ParseSolid(const char *p)
 	{
-		while (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != ';' && *p != '{') if (*p) p++; else return p;
+		while (*p && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n' && *p != ';' && *p != '{')
+		{
+			if (const char *q = ParseCommon(p))
+				p = q;
+			else
+				p++;
+		}
 		return p;
 	}
 	

@@ -63,8 +63,7 @@ public:
 			CamoItem &item = *items[i];
 			write(fd, _comments[item.type].type, sizeof(_comments[0].type) - 1);
 			
-			
-			CamoItem &newItem = *NewItem();
+			CamoItem &newItem = *NewItem(item);
 			ProduceItem(fd, item, newItem _ALIGN_ARG);
 			
 			if (item.type == CamoItemProperty)
@@ -93,7 +92,7 @@ private:
 		write(fd, item.symbol, item.length);
 		
 		_ALIGN_LOOP(item.length);
-		
+
 		write(fd, newItem.symbol, newItem.length);
 		
 		write(fd, "\n", 1);
@@ -117,19 +116,40 @@ private:
 		write(fd, newItem.symbol + 1, newItem.length - 1);
 		
 		write(fd, "\n", 1);
+		
+		//
+		write(fd, "/* AUTV */ ", sizeof("/* AUTV */ ") - 1);
+		write(fd, "#define ", sizeof("#define ") - 1);
+		write(fd, "_", 1);
+		write(fd, item.symbol, item.length);
+		
+		_ALIGN_LOOP(item.length + 3);
+		
+		write(fd, "_", 1);
+		write(fd, newItem.symbol, newItem.length);
+		
+		write(fd, "\n", 1);
 	}
 	
 	//
-	CamoItem *NewItem()
+	CamoItem *NewItem(CamoItem &item)
 	{
 		char buffer[256];
-		unsigned length = 8 + rand() % 10;
+		unsigned length = 8 + rand() % 16;
 		const static char newSymbolChars[] = "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		while (true)
 		{
-			buffer[0] = newSymbolChars[rand() % 26];	// To ensure lower case for property
-			buffer[1] = '0' + rand() % 10;	// To ensure digit char
-			for (unsigned i = 2; i < length; i++)
+			unsigned i = 0;
+			if (!memcmp(item.symbol, "init", 4))
+			{
+				i = 5;
+				memcpy(buffer, "initW", 5);
+			}
+
+			buffer[i++] = newSymbolChars[rand() % 26];	// To ensure lower case for property
+			buffer[i++] = '0' + rand() % 10;	// To ensure digit char
+			
+			for (; i < length; i++)
 			{
 				buffer[i] = newSymbolChars[rand() % (sizeof(newSymbolChars) - 1)];
 			}
