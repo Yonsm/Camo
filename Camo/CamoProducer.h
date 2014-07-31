@@ -142,14 +142,14 @@ private:
 			unsigned i = 0;
 			if (!memcmp(item.symbol, "init", 4))
 			{
-				i = 5;
-				memcpy(buffer, "initW", 5);
+				memcpy(buffer, "init", 4);
+				i = 4;
 			}
 
-			buffer[i++] = newSymbolChars[rand() % 26];	// To ensure lower case for property
-			buffer[i++] = '0' + rand() % 10;	// To ensure digit char
+			buffer[i] = newSymbolChars[(i ? 27 : 0) + rand() % 27];	// To ensure lower case for property or upper case for init
+			buffer[i + 1] = '0' + rand() % 10;	// To ensure digit char
 			
-			for (; i < length; i++)
+			for (i += 2; i < length; i++)
 			{
 				buffer[i] = newSymbolChars[rand() % (sizeof(newSymbolChars) - 1)];
 			}
