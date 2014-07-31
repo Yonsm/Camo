@@ -25,8 +25,8 @@ public:
 			
 			{"/* PROP */ ", "Property Symbol"},
 			{"/* REAP */ ", "Readonly Property Symbol"},
-			{"/* SETP */ ", "Property Setter Symbol"},
-			{"/* GETP */ ", "Property Getter Symbol"},
+			{"/* PSET */ ", "Property Setter Symbol"},
+			{"/* PGET */ ", "Property Getter Symbol"},
 			
 			{"/* PROT */ ", "Protocol Symbol"},
 			{"/* INTE */ ", "Interface Symbol"},
@@ -66,11 +66,15 @@ public:
 			CamoItem &newItem = *NewItem(item);
 			ProduceItem(fd, item, newItem _ALIGN_ARG);
 			
-			if (item.type == CamoItemProperty)
+			if (item.type == CamoItemProperty || item.type == CamoItemReadOnly)
 			{
 				count += 2;
-				ProduceSetItem(fd, item, newItem _ALIGN_ARG);
-				
+				ProduceVarItem(fd, item, newItem _ALIGN_ARG);
+				if (item.type == CamoItemProperty)
+				{
+					count++;
+					ProduceSetItem(fd, item, newItem _ALIGN_ARG);
+				}
 			}
 			else if (item.type != CamoItemIgnore)
 			{
@@ -99,9 +103,25 @@ private:
 	}
 	
 	//
+	inline void ProduceVarItem(int fd, CamoItem &item, CamoItem &newItem _ALIGN_PARAM)
+	{
+		write(fd, "/* VARP */ ", sizeof("/* VARP */ ") - 1);
+		write(fd, "#define ", sizeof("#define ") - 1);
+		write(fd, "_", 1);
+		write(fd, item.symbol, item.length);
+		
+		_ALIGN_LOOP(item.length + 3);
+		
+		write(fd, "_", 1);
+		write(fd, newItem.symbol, newItem.length);
+		
+		write(fd, "\n", 1);
+	}
+	
+	//
 	inline void ProduceSetItem(int fd, CamoItem &item, CamoItem &newItem _ALIGN_PARAM)
 	{
-		write(fd, "/* AUTP */ ", sizeof("/* AUTP */ ") - 1);
+		write(fd, "/* SETP */ ", sizeof("/* SETP */ ") - 1);
 		write(fd, "#define ", sizeof("#define ") - 1);
 		write(fd, "set", sizeof("set") - 1);
 		char ch1 = toupper(item.symbol[0]);
@@ -114,19 +134,6 @@ private:
 		char ch2 = toupper(newItem.symbol[0]);
 		write(fd, &ch2, 1);
 		write(fd, newItem.symbol + 1, newItem.length - 1);
-		
-		write(fd, "\n", 1);
-		
-		//
-		write(fd, "/* AUTV */ ", sizeof("/* AUTV */ ") - 1);
-		write(fd, "#define ", sizeof("#define ") - 1);
-		write(fd, "_", 1);
-		write(fd, item.symbol, item.length);
-		
-		_ALIGN_LOOP(item.length + 3);
-		
-		write(fd, "_", 1);
-		write(fd, newItem.symbol, newItem.length);
 		
 		write(fd, "\n", 1);
 	}

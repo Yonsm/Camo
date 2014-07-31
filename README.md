@@ -2,7 +2,7 @@
 Camo Preprocessor
 ======
 <pre>
-Camo Preprocessor 1.0.6.0731
+Camo Preprocessor 1.0.9.0731
 Symbol Confusion for Objective C/C++
 Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.
 
@@ -28,7 +28,7 @@ EXAMPLE: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
 
 EXAMPLE: Camo $ "@interface MyObj - (void)myMethod; @property BOOL myProp; @end"
 
-IMPORTANT: Check the output carefully, especially under the complex circumstance.
+IMPORTANT: CHECK OUTPUT SYMBOLS CAREFULLY, ESPECIALLY UNDER COMPLEX CIRCUMSTANCE
 </pre>
 
 Download Binary: [Camo for Mac OS X 10.9+](https://raw.githubusercontent.com/Yonsm/Camo/master/Release/Camo)
