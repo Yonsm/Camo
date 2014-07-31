@@ -203,7 +203,7 @@ private:
 	{
 		const char *p = code + 1;
 		p = ParseUntil(p, '\(');
-		p = ParseBlock<'(', ')'>(p);
+		p = ParseBlock<'('>(p);
 		p = ParseBlank(p);
 		const char *symbol = p;
 		const char *first = symbol;
@@ -230,7 +230,7 @@ private:
 					p = ParseBlank(p + 1);
 					if (*p == '(')
 					{
-						p = ParseBlock<'(', ')'>(p);
+						p = ParseBlock<'('>(p);
 						p = ParseBlank(p);
 					}
 					p = ParseSolid(p);
@@ -251,7 +251,7 @@ private:
 	const char *ParseProperty(const char *code)
 	{
 		CamoItemType type = CamoItemProperty;
-		const char *p = code + sizeof("@propterty") - 1;
+		const char *p = code + sizeof("@property") - 1;
 		p = ParseBlank(p);
 		if (*p == '(')
 		{
@@ -283,9 +283,41 @@ private:
 		}
 		
 		p = ParseSolid(p);
-		while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '*') p++;
-		p = ParseSymbol(p, type);
-		while (*p && *p++ != ';');
+		while (*p)
+		{
+			if (const char *q = ParseCommon(p))
+			{
+				p = q;
+			}
+			else switch (*p)
+			{
+				case '(':
+					p = ParseBlock<'('>(p);
+					break;
+
+				case '<':
+					p = ParseBlock<'<'>(p);
+					break;
+
+				case '{':
+					p = ParseBlock(p);
+					break;
+					
+				case ' ':
+				case '\t':
+				case '\r':
+				case '\n':
+				case '*':
+				case '&':
+					p++;
+					break;
+					
+				default:
+					p = ParseSymbol(p, type);
+					while (*p && *p++ != ';');
+					return p;
+			}
+		}
 		return p;
 	}
 	
@@ -410,11 +442,11 @@ private:
 		return p;
 	}
 	
-	//  Nest block () [] {}
-	template <char STARTCHAR = '{', char ENDCHAR = '}'> const char *ParseBlock(const char *code)
+	//  Nest block () [] {} <>
+	template <char STARTCHAR = '{'> const char *ParseBlock(const char *code)
 	{
 		//		char STARTCHAR = *code;
-		//		char ENDCHAR = (STARTCHAR == '(') ? ')' : (STARTCHAR + 2);
+		char ENDCHAR = (STARTCHAR == '(') ? ')' : (STARTCHAR + 2);
 		const char *p = code + 1;
 		while (*p)
 		{
@@ -428,7 +460,7 @@ private:
 			}
 			else if (*p == STARTCHAR)
 			{
-				p = ParseBlock<STARTCHAR, ENDCHAR>(p);
+				p = ParseBlock<STARTCHAR>(p);
 			}
 			else
 			{
@@ -458,6 +490,16 @@ private:
 				{
 					if (*p == ':')
 					{
+						if (!memcmp(symbol, "set", 3))	// Ignore setter
+						{
+							char ch = symbol[3];
+							if (ch >= 'A' && ch <= 'Z')
+							{
+								((char *)symbol)[3] = tolower(ch);
+								symbols.PushSymbol(symbol + 3, unsigned(p - symbol - 3), CamoItemIgnore);
+								((char *)symbol)[3] = ch;
+							}
+						}
 						symbols.PushSymbol(symbol, unsigned(p - symbol), CamoItemIgnore);
 						symbol = p + 1;
 					}

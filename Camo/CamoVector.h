@@ -60,14 +60,17 @@ public:
 		{
 			return NULL;
 		}
-		
+
 		// Skip duplicate
 		for (CamoVector::iterator it = begin(); it != end(); ++it)
 		{
 			CamoItem &item = **it;
 			if ((length == item.length) && !memcmp(symbol, item.symbol, length))
 			{
-				item.type = type;
+				if (item.type != CamoItemProperty && item.type != CamoItemIgnore)
+				{
+					item.type = type;
+				}
 				return NULL;
 			}
 		}
