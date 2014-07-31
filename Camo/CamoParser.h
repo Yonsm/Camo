@@ -94,13 +94,17 @@ private:
 			{
 				memset(code + stat.st_size, 0, 16);
 				read(fd, code, stat.st_size);
-#ifdef _SUPPORT_UTF_16LE
+#ifdef _SUPPORT_UTF16
 				if ((code[0] == '\xFF' && code[1] == '\xFE') || (stat.st_size > 2 && code[1] == 0))
 				{
 					std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
 					std::u16string u16str = (char16_t *)code;
 					std::string u8str = convert.to_bytes(u16str);
 					ParseCode(u8str.c_str());
+				}
+				else if ((code[0] == '\xFE' && code[1] == '\xFF') || (stat.st_size > 2 && code[0] == 0))
+				{
+					//TODO: Shit! How to convert UTF-16 BE to UTF-8?
 				}
 				else
 #endif
