@@ -5,7 +5,7 @@
 //
 int main(int argc, char * argv[])
 {
-	puts("Camo Preprocessor 1.0.8.0731\n"
+	puts("Camo Preprocessor 1.0.9.0731\n"
 		 "Symbol Confusion for Objective C/C++\n"
 		 "Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.\n");
 	
@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
 			 "EXAMPLE: Camo ./CamoPrefix.h ./Sources -\n\n"
 			 "EXAMPLE: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -\n\n"
 			 "EXAMPLE: Camo $ \"@interface MyObj - (void)myMethod; @property BOOL myProp; @end\"\n\n"
-			 "IMPORTANT: Check the output carefully, especially under the complex circumstance.\n");
+			 "IMPORTANT: CHECK OUTPUT SYMBOLS CAREFULLY, ESPECIALLY UNDER COMPLEX CIRCUMSTANCE\n");
 		return EXIT_FAILURE;
 	}
 	
