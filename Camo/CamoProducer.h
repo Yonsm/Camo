@@ -123,7 +123,7 @@ private:
 	CamoItem *NewItem()
 	{
 		char buffer[256];
-		unsigned length = 10 + rand() % 15;
+		unsigned length = 8 + rand() % 10;
 		const static char newSymbolChars[] = "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		while (true)
 		{
