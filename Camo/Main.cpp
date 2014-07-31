@@ -5,7 +5,7 @@
 //
 int main(int argc, char * argv[])
 {
-	puts("Camo Preprocessor 1.0.6.0731\n"
+	puts("Camo Preprocessor 1.0.7.0731\n"
 		 "Symbol Confusion for Objective C/C++\n"
 		 "Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.\n");
 	
