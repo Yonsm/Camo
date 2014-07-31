@@ -6,6 +6,12 @@
 #import <unistd.h>
 #import <sys/stat.h>
 
+#ifdef _SUPPORT_UTF_16LE
+#import <string>
+#import <codecvt>
+#include <fstream>
+#endif
+
 //
 class CamoParser
 {
@@ -88,7 +94,19 @@ private:
 			{
 				memset(code + stat.st_size, 0, 16);
 				read(fd, code, stat.st_size);
-				ParseCode(code);
+#ifdef _SUPPORT_UTF_16LE
+				if ((code[0] == '\xFF' && code[1] == '\xFE') || (stat.st_size > 2 && code[1] == 0))
+				{
+					std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
+					std::u16string u16str = (char16_t *)code;
+					std::string u8str = convert.to_bytes(u16str);
+					ParseCode(u8str.c_str());
+				}
+				else
+#endif
+				{
+					ParseCode(code);
+				}
 				free(code);
 			}
 			else
@@ -283,7 +301,7 @@ private:
 		}
 		return ParseSymbol(code, CamoItemMethod);
 	}
-		
+	
 	//
 	const char *ParseSymbol(const char *code, CamoItemType type/* = CamoItemNormal*/)
 	{

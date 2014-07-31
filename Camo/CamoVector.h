@@ -3,6 +3,7 @@
 #import <vector>
 
 //#define _SUPPORT_ALIGN
+//#define _SUPPORT_UTF_16LE
 
 //
 enum CamoItemType
