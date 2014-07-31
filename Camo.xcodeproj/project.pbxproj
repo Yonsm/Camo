@@ -7,22 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		246804AB19897F3A00417660 /* Camo in CopyFiles */ = {isa = PBXBuildFile; fileRef = 24E4D1F41980B33200E79713 /* Camo */; };
 		24E4D1F81980B33200E79713 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24E4D1F71980B33200E79713 /* Main.cpp */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		24E4D1F21980B33200E79713 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = "$(SRCROOT)/Release";
-			dstSubfolderSpec = 0;
-			files = (
-				246804AB19897F3A00417660 /* Camo in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		24E4D1F41980B33200E79713 /* Camo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Camo; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,7 +65,7 @@
 			buildPhases = (
 				24E4D1F01980B33200E79713 /* Sources */,
 				24E4D1F11980B33200E79713 /* Frameworks */,
-				24E4D1F21980B33200E79713 /* CopyFiles */,
+				247B2AAA198A385B00670593 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -115,6 +101,24 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		247B2AAA198A385B00670593 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ $BUILT_PRODUCTS_DIR = */Release* ]]; then\nstrip -x $BUILT_PRODUCTS_DIR/$EXECUTABLE_NAME\ncp -f $BUILT_PRODUCTS_DIR/$EXECUTABLE_NAME ./Release/\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		24E4D1F01980B33200E79713 /* Sources */ = {
