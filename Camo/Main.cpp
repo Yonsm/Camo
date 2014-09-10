@@ -24,6 +24,7 @@ int main(int argc, char * argv[])
 			 "       -           Exclude symbols from iPhone SDK\n\n"
 			 "EXAMPLE: Camo $ ./Sources\n\n"
 			 "EXAMPLE: Camo ./CamoPrefix.h ./Sources -\n\n"
+			 "EXAMPLE: Camo @ABC . -./Base -./Logic/RPC -../Pods - | grep \"IMPL\"\n\n"
 			 "EXAMPLE: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -\n\n"
 			 "EXAMPLE: Camo $ \"@interface MyObj - (void)myMethod; @property BOOL myProp; @end\"\n\n"
 			 "IMPORTANT: CHECK OUTPUT SYMBOLS CAREFULLY, ESPECIALLY UNDER COMPLEX CIRCUMSTANCE\n");

@@ -2,14 +2,15 @@
 Camo Preprocessor
 ======
 <pre>
-Camo Preprocessor 1.0.9.0731
+Camo Preprocessor 1.0.10.0909
 Symbol Confusion for Objective C/C++
 Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.
 
-USAGE: Camo [OutFile|$] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ...
+USAGE: Camo [OutFile|@[Prefix]] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ...
 
        OutFile     Output symbols to file
-       $           Output symbols to stdout
+       @           Output symbols to stdout
+       Prefix      Fixed prefix instead of random
 
        Dir         Include symbols from dir
        File        Include symbols from file
@@ -23,6 +24,8 @@ USAGE: Camo [OutFile|$] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ...
 EXAMPLE: Camo $ ./Sources
 
 EXAMPLE: Camo ./CamoPrefix.h ./Sources -
+
+EXAMPLE: Camo @ABC . -./Base -./Logic/RPC -../Pods - | grep "IMPL"
 
 EXAMPLE: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
 
