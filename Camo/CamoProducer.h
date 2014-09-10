@@ -9,7 +9,7 @@ public:
 	//
 	int Produce(const char *file, CamoVector &items, unsigned begin = 0)
 	{
-		bool stdo = (file[0] == '$' && file[1] == 0);
+		bool stdo = (file[0] == '@');
 		int fd = stdo ? fileno(stdout) : creat(file, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 		if (fd == -1)
 		{
@@ -53,7 +53,10 @@ public:
 #define _ALIGN_PARAM
 #define _ALIGN_LOOP(n)	write(fd, " ", 1)
 #endif
-		
+
+		const char *prefix = (stdo && file[1]) ? (file + 1) : NULL;
+		size_t prefixLength = prefix ? strlen(prefix) : 0;
+
 		//
 		signed count = 0;
 		srand((unsigned)time(NULL));
@@ -63,7 +66,7 @@ public:
 			CamoItem &item = *items[i];
 			write(fd, _comments[item.type].type, sizeof(_comments[0].type) - 1);
 			
-			CamoItem &newItem = *NewItem(item);
+			CamoItem &newItem = *NewItem(item, prefix, prefixLength);
 			ProduceItem(fd, item, newItem _ALIGN_ARG);
 			
 			if (item.type == CamoItemProperty || item.type == CamoItemReadOnly)
@@ -139,7 +142,7 @@ private:
 	}
 	
 	//
-	CamoItem *NewItem(CamoItem &item)
+	CamoItem *NewItem(CamoItem &item, const char *prefix, size_t prefixLength)
 	{
 		char buffer[256];
 		unsigned length = 8 + rand() % 16;
@@ -153,14 +156,32 @@ private:
 				i = 4;
 			}
 
-			buffer[i] = newSymbolChars[(i ? 27 : 0) + rand() % 27];	// To ensure lower case for property or upper case for init
-			buffer[i + 1] = '0' + rand() % 10;	// To ensure digit char
-			
-			for (i += 2; i < length; i++)
+			if (prefix)
 			{
-				buffer[i] = newSymbolChars[rand() % (sizeof(newSymbolChars) - 1)];
+				memcpy(buffer + i, prefix, prefixLength);
+				i += prefixLength;
+
+				memcpy(buffer + i, item.symbol, item.length);
+				i += item.length;
+
+				CamoItem *newItem = _newItems.PushSymbol(buffer, i);
+				if (newItem)
+				{
+					return newItem;
+				}
+				prefix = NULL; // Fallback to random
 			}
-			
+			else
+			{
+				buffer[i] = newSymbolChars[(i ? 27 : 0) + rand() % 27];	// To ensure lower case for property or upper case for init
+				buffer[i + 1] = '0' + rand() % 10;	// To ensure digit char
+
+				for (i += 2; i < length; i++)
+				{
+					buffer[i] = newSymbolChars[rand() % (sizeof(newSymbolChars) - 1)];
+				}
+			}
+
 			CamoItem *newItem = _newItems.PushSymbol(buffer, length);
 			if (newItem)
 			{

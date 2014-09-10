@@ -5,15 +5,16 @@
 //
 int main(int argc, char * argv[])
 {
-	puts("Camo Preprocessor 1.0.9.0731\n"
+	puts("Camo Preprocessor 1.0.10.0909\n"
 		 "Symbol Confusion for Objective C/C++\n"
 		 "Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.\n");
 	
 	if (argc < 3)
 	{
-		puts("USAGE: Camo [OutFile|$] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ...\n\n"
+		puts("USAGE: Camo [OutFile|@[Prefix]] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ...\n\n"
 			 "       OutFile     Output symbols to file\n"
-			 "       $           Output symbols to stdout\n\n"
+			 "       @           Output symbols to stdout\n"
+			 "       Prefix      Fixed prefix instead of random\n\n"
 			 "       Dir         Include symbols from dir\n"
 			 "       File        Include symbols from file\n"
 			 "       @Code       Include symbols from code\n\n"
