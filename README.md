@@ -21,7 +21,7 @@ USAGE: Camo [OutFile|@[Prefix]] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ..
        -@Code      Exclude symbols from code
        -           Exclude symbols from iPhone SDK
 
-EXAMPLE: Camo $ ./Sources
+EXAMPLE: Camo @ ./Sources
 
 EXAMPLE: Camo ./CamoPrefix.h ./Sources -
 
@@ -29,9 +29,9 @@ EXAMPLE: Camo @ABC . -./Base -./Logic/RPC -../Pods - | grep "IMPL"
 
 EXAMPLE: Camo ./CamoPrefix.h ./Sources -./Sources/Export.h -./Pods -
 
-EXAMPLE: Camo $ "@interface MyObj - (void)myMethod; @property BOOL myProp; @end"
+EXAMPLE: Camo @ "@interface MyObj - (void)myMethod; @property BOOL myProp; @end"
 
-IMPORTANT: CHECK OUTPUT SYMBOLS CAREFULLY, ESPECIALLY UNDER COMPLEX CIRCUMSTANCE
+IMPORTANT: CHECK OUTPUT SYMBOLS CAREFULLY, ESPECIALLY UNDER COMPLEX CIRCUMSTANC
 </pre>
 
 Download Binary: [Camo for Mac OS X 10.9+](https://raw.githubusercontent.com/Yonsm/Camo/master/Release/Camo)
