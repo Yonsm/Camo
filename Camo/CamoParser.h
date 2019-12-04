@@ -65,11 +65,12 @@ private:
 				{
 					strcpy(subpath, ent->d_name);
 					char *endpath = subpath + strlen(subpath);
-					if (ent->d_type == DT_DIR && recursive)
+					if (ent->d_type == DT_DIR)
 					{
-						ParseDir(path);
+						if (recursive)
+							ParseDir(path);
 					}
-					else if (!memcmp(endpath - 2, ".h", 2) || !memcmp(endpath - 2, ".m", 2) || !memcmp(endpath - 3, ".mm", 3))
+					else if (!memcmp(endpath - 2, ".h", 2) || !memcmp(endpath - 2, ".m", 2) || !memcmp(endpath - 3, ".mm", 3) || !memcmp(endpath - 2, ".c", 2) || !memcmp(endpath - 4, ".cpp", 4))
 					{
 						ParseFile(path);
 					}
@@ -109,6 +110,8 @@ private:
 				else if ((code[0] == '\xFE' && code[1] == '\xFF') || (stat.st_size > 2 && code[0] == 0))
 				{
 					//TODO: Shit! How to convert UTF-16 BE to UTF-8?
+					printf("ERROR: Could not support UTF-16 BE in %s\n", file);
+					exit(-1);
 				}
 				else
 #endif
