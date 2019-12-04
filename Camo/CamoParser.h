@@ -26,6 +26,10 @@ public:
 		{
 			ParseCode(arg);
 		}
+		else if (*arg == '!')
+		{
+			ParseDir(arg + 1, false);
+		}
 		else
 		{
 			struct stat st;
@@ -43,7 +47,7 @@ public:
 	
 private:
 	//
-	void ParseDir(const char *dir)
+	void ParseDir(const char *dir, bool recursive = true)
 	{
 		DIR *dp = opendir(dir);
 		if (dp)
@@ -61,7 +65,7 @@ private:
 				{
 					strcpy(subpath, ent->d_name);
 					char *endpath = subpath + strlen(subpath);
-					if (ent->d_type == DT_DIR)
+					if (ent->d_type == DT_DIR && recursive)
 					{
 						ParseDir(path);
 					}

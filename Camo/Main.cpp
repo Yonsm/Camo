@@ -11,14 +11,16 @@ int main(int argc, char * argv[])
 	
 	if (argc < 3)
 	{
-		puts("USAGE: Camo [OutFile|@[Prefix]] [-][Dir1|File1|@Code1] [-][Dir2|File2|@Code2] ...\n\n"
+		puts("USAGE: Camo [OutFile|@[Prefix]] [-][Dir1|!Dir1|File1|@Code1] [-][Dir2|!Dir2|File2|@Code2] ...\n\n"
 			 "       OutFile     Output symbols to file\n"
 			 "       @           Output symbols to stdout\n"
 			 "       Prefix      Fixed prefix instead of random\n\n"
-			 "       Dir         Include symbols from dir\n"
+			 "       Dir         Include symbols from dir recursive\n"
+			 "       !Dir        Include symbols from dir only\n"
 			 "       File        Include symbols from file\n"
 			 "       @Code       Include symbols from code\n\n"
-			 "       -Dir        Exclude symbols from dir\n"
+			 "       -Dir        Exclude symbols from dir recursive\n"
+			 "       -!Dir       Exclude symbols from dir only\n"
 			 "       -File       Exclude symbols from file\n"
 			 "       -@Code      Exclude symbols from code\n"
 			 "       -           Exclude symbols from iPhone SDK\n\n"
