@@ -46,7 +46,7 @@ int main(int argc, char * argv[])
 		}
 	}
 	
-	unsigned exclude = (unsigned)parser.items.size();
+	unsigned exclude = (unsigned)parser.symbols.size();
 	if (exclude)
 	{
 		printf("EXCLUDE: %d symbols\n\n", (int)exclude);
@@ -65,14 +65,14 @@ int main(int argc, char * argv[])
 		}
 	}
 	
-	unsigned total = (unsigned)parser.items.size();
+	unsigned total = (unsigned)parser.symbols.size();
 	if (total > exclude)
 	{
 		printf("INCLUDE: %d symbols\n\n", (int)(total - exclude));
 		
 		CamoProducer producer;
 		
-		return producer.Produce(argv[1], parser.items, exclude);
+		return producer.Produce(argv[1], parser.symbols, exclude);
 	}
 	else
 	{

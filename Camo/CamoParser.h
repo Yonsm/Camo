@@ -16,7 +16,8 @@
 class CamoParser
 {
 public:
-	CamoVector items;
+	CamoVector symbols;
+//	CamoVector strings;
 
 public:
 	//
@@ -348,7 +349,7 @@ private:
 	{
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
-		items.PushItem(code, unsigned(p - code), type);
+		symbols.PushItem(code, unsigned(p - code), type);
 		return p;
 	}
 	
@@ -397,7 +398,8 @@ private:
 			}
 			else if (*p == ch)
 			{
-				items.PushItem(code, unsigned(p - code - 1), CamoItemString);
+//				if (ch == '"')
+//					strings.PushItem(code, unsigned(p - code - 1), CamoItemString);
 				PrintOut("STRING:", code, p + 1);
 				return p + 1;
 			}
@@ -492,16 +494,16 @@ private:
 							if (ch >= 'A' && ch <= 'Z')
 							{
 								((char *)symbol)[3] = tolower(ch);
-								items.PushItem(symbol + 3, unsigned(p - symbol - 3), CamoItemIgnore);
+								symbols.PushItem(symbol + 3, unsigned(p - symbol - 3), CamoItemIgnore);
 								((char *)symbol)[3] = ch;
 							}
 						}
-						items.PushItem(symbol, unsigned(p - symbol), CamoItemIgnore);
+						symbols.PushItem(symbol, unsigned(p - symbol), CamoItemIgnore);
 						symbol = p + 1;
 					}
 					else if (*p == '"')
 					{
-						items.PushItem(symbol, unsigned(p - symbol), CamoItemIgnore);
+						symbols.PushItem(symbol, unsigned(p - symbol), CamoItemIgnore);
 						p++;
 						break;
 					}
