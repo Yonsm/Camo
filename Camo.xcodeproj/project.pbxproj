@@ -87,10 +87,9 @@
 			};
 			buildConfigurationList = 24E4D1EF1980B33200E79713 /* Build configuration list for PBXProject "Camo" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 			);
 			mainGroup = 24E4D1EB1980B33200E79713;
