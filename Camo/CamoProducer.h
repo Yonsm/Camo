@@ -164,7 +164,7 @@ private:
 				memcpy(buffer + i, item.symbol, item.length);
 				i += item.length;
 
-				CamoItem *newItem = _newItems.PushSymbol(buffer, i);
+				CamoItem *newItem = _newItems.PushItem(buffer, i);
 				if (newItem)
 				{
 					return newItem;
@@ -182,7 +182,7 @@ private:
 				}
 			}
 
-			CamoItem *newItem = _newItems.PushSymbol(buffer, length);
+			CamoItem *newItem = _newItems.PushItem(buffer, length);
 			if (newItem)
 			{
 				return newItem;

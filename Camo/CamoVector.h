@@ -19,6 +19,8 @@ enum CamoItemType
 	CamoItemProtocol,
 	CamoItemInterface,
 	CamoItemImplementation,
+	
+	CamoItemString,
 };
 
 //
@@ -54,7 +56,7 @@ public:
 	
 public:
 	//
-	CamoItem *PushSymbol(const char *symbol, unsigned length, CamoItemType type = CamoItemIgnore)
+	CamoItem *PushItem(const char *symbol, unsigned length, CamoItemType type = CamoItemIgnore)
 	{
 		if (length == 0)
 		{

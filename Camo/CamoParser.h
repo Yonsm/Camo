@@ -16,8 +16,8 @@
 class CamoParser
 {
 public:
-	CamoVector symbols;
-	
+	CamoVector items;
+
 public:
 	//
 	void Parse(const char *arg)
@@ -348,7 +348,7 @@ private:
 	{
 		const char *p = code;
 		while ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p == '$')) p++;
-		symbols.PushSymbol(code, unsigned(p - code), type);
+		items.PushItem(code, unsigned(p - code), type);
 		return p;
 	}
 	
@@ -397,6 +397,7 @@ private:
 			}
 			else if (*p == ch)
 			{
+				items.PushItem(code, unsigned(p - code - 1), CamoItemString);
 				PrintOut("STRING:", code, p + 1);
 				return p + 1;
 			}
@@ -491,16 +492,16 @@ private:
 							if (ch >= 'A' && ch <= 'Z')
 							{
 								((char *)symbol)[3] = tolower(ch);
-								symbols.PushSymbol(symbol + 3, unsigned(p - symbol - 3), CamoItemIgnore);
+								items.PushItem(symbol + 3, unsigned(p - symbol - 3), CamoItemIgnore);
 								((char *)symbol)[3] = ch;
 							}
 						}
-						symbols.PushSymbol(symbol, unsigned(p - symbol), CamoItemIgnore);
+						items.PushItem(symbol, unsigned(p - symbol), CamoItemIgnore);
 						symbol = p + 1;
 					}
 					else if (*p == '"')
 					{
-						symbols.PushSymbol(symbol, unsigned(p - symbol), CamoItemIgnore);
+						items.PushItem(symbol, unsigned(p - symbol), CamoItemIgnore);
 						p++;
 						break;
 					}
