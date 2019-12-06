@@ -2,7 +2,7 @@
 #import "CamoParser.h"
 #import "CamoProducer.h"
 
-#define MAX_SLUGIFY 32
+#define MAX_SLUGIFY 64
 unsigned slugify(char *dst, const char *src, unsigned length)
 {
 	signed j = 0;
@@ -86,6 +86,8 @@ int main(int argc, char *argv[])
 			parser.Parse(argv[i]);
 		}
 	}
+	
+	write(fileno(stdout), "\n", 1);
 	unsigned end = (unsigned)parser.strings.size();
 	for (unsigned i = 0; i < end; i++)
 	{
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
 		char name[MAX_SLUGIFY];
 		unsigned length = slugify(name, item.symbol, item.length);
 
-		write(fileno(stdout), "\n// ", 4);
+		write(fileno(stdout), "// ", 3);
 		write(fileno(stdout), item.symbol, item.length);
 		write(fileno(stdout), "\n", 1);
 
@@ -119,11 +121,12 @@ int main(int argc, char *argv[])
 				else if (c == 'n') c = '\n';
 				else if (c == 't') c = '\t';
 			}
-			c = c ^ item.length - k;
+			c = (c ^ (unsigned char)item.length) - k;
 			printf("\\x%02x", c);
 		}
 		printf("\", %d)\n", item.length);
 	}
+	write(fileno(stdout), "\n", 1);
 
 	unsigned total = (unsigned)parser.symbols.size();
 	if (total > exclude)
