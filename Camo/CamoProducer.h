@@ -3,6 +3,11 @@
 #import <errno.h>
 #define MAX_SLUGIFY 64
 
+// TODO: CFString
+// TODO: Duplicated scan
+// TODO: Refine args, Remove file output
+// TODO: Fine C String usage
+
 //
 class CamoProducer
 {
@@ -17,7 +22,7 @@ public:
 			_fd = fileno(stdout);
 			_console = true;
 		}
-		_prefix = (_console && file[1]) ? (file + 1) : NULL; // TODO: Refine args, Remove file output
+		_prefix = (_console && file[1]) ? (file + 1) : NULL;
 	}
 	
 	inline ~CamoProducer()

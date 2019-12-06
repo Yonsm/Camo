@@ -5,9 +5,9 @@
 //
 int main(int argc, char *argv[])
 {
-	puts("Camo Preprocessor 1.0.10.0909\n"
+	puts("Camo Preprocessor 2.0.19.1206\n"
 		 "Symbol Confusion for Objective C/C++\n"
-		 "Copyleft(L) 2014, Yonsm.NET, No Rights Reserved.\n");
+		 "Copyleft(L) 2014-2019, Yonsm.NET, No Rights Reserved.\n");
 	
 	if (argc < 3)
 	{
