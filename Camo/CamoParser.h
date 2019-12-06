@@ -17,12 +17,17 @@ class CamoParser
 {
 public:
 	CamoVector symbols;
-//	CamoVector strings;
+	CamoVector strings;
 
+private:
+	bool _exclude;
+	
 public:
 	//
-	void Parse(const char *arg)
+	void Parse(const char *arg, bool exclude = false)
 	{
+		_exclude = exclude;
+
 		if (*arg == '@')
 		{
 			ParseCode(arg);
@@ -398,8 +403,8 @@ private:
 			}
 			else if (*p == ch)
 			{
-//				if (ch == '"')
-//					strings.PushItem(code, unsigned(p - code - 1), CamoItemString);
+				if (!_exclude && ch == '"' && p > code + 3)
+					strings.PushItem(code + 1, unsigned(p - code - 1), CamoItemString);
 				PrintOut("STRING:", code, p + 1);
 				return p + 1;
 			}
