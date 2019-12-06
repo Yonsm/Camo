@@ -2,28 +2,6 @@
 #import "CamoParser.h"
 #import "CamoProducer.h"
 
-#define MAX_SLUGIFY 64
-unsigned slugify(char *dst, const char *src, unsigned length)
-{
-	signed j = 0;
-	for (signed i = 0; (i < length && j < MAX_SLUGIFY - 1); i++)
-	{
-		char c = src[i];
-		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
-		{
-			dst[j++] = c;
-		}
-		else if (j && dst[j - 1] != '_')
-		{
-			dst[j++] = '_';
-		}
-	}
-	if (j && dst[j - 1] == '_')
-		j--;
-	dst[j] = 0;
-	return j;
-}
-
 //
 int main(int argc, char *argv[])
 {
@@ -86,65 +64,15 @@ int main(int argc, char *argv[])
 			parser.Parse(argv[i]);
 		}
 	}
-	
-	write(fileno(stdout), "\n", 1);
-	unsigned end = (unsigned)parser.strings.size();
-	for (unsigned i = 0; i < end; i++)
-	{
-		CamoItem &item = *parser.strings[i];
-		char name[MAX_SLUGIFY];
-		unsigned length = slugify(name, item.symbol, item.length);
-
-		write(fileno(stdout), item.type == CamoItemString ? "// " : "//@", 3);
-		write(fileno(stdout), item.symbol, item.length);
-		write(fileno(stdout), "\n", 1);
-
-		write(fileno(stdout), "#define CAMO_", 13);
-		write(fileno(stdout), name, length);
-		write(fileno(stdout), " ", 1);
-		
-		if (item.type == CamoItemString)
-		{
-			write(fileno(stdout), "char camo_", 10);
-			write(fileno(stdout), name, length);
-			printf("[%d];", item.length + 1);
-
-			write(fileno(stdout), " CamoStringDecode(camo_", 23);
-			write(fileno(stdout), name, length);
-			write(fileno(stdout), ", \"", 3);
-		}
-		else
-		{
-			write(fileno(stdout), " CFBridgingRelease(CamoStringDecode2(\"", 38);
-		}
-
-		for (unsigned k = 0; k < item.length; k++)
-		{
-			char c = item.symbol[k];
-			if (c == '\\')
-			{
-				c = item.symbol[++k];
-				if (c == 'r') c = '\r';
-				else if (c == 'n') c = '\n';
-				else if (c == 't') c = '\t';
-			}
-			c = (c ^ (unsigned char)item.length) - k;
-			printf("\\x%02x", c);
-		}
-		printf("\", %d)", item.length);
-		printf((item.type == CamoItemNSString) ? ")\n" : "\n");
-			
-	}
-	write(fileno(stdout), "\n", 1);
 
 	unsigned total = (unsigned)parser.symbols.size();
 	if (total > exclude)
 	{
 		printf("INCLUDE: %d symbols\n\n", (int)(total - exclude));
 		
-		CamoProducer producer;
-		
-		return producer.Produce(argv[1], parser.symbols, exclude);
+		CamoProducer producer(argv[1]);
+		producer.ProduceSymbols(parser.symbols, exclude);
+		producer.ProduceStrings(parser.strings);
 	}
 	else
 	{
