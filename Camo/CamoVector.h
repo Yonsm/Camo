@@ -29,7 +29,7 @@ struct CamoItem
 {
 	CamoItemType type;
 	unsigned length;
-	char symbol[];
+	char payload[];
 };
 
 //
@@ -57,7 +57,7 @@ public:
 	
 public:
 	//
-	CamoItem *PushItem(const char *symbol, unsigned length, CamoItemType type = CamoItemIgnore)
+	CamoItem *PushItem(const char *payload, unsigned length, CamoItemType type = CamoItemIgnore)
 	{
 		if (length == 0)
 		{
@@ -68,7 +68,7 @@ public:
 		for (CamoVector::iterator it = begin(); it != end(); ++it)
 		{
 			CamoItem &item = **it;
-			if ((length == item.length) && !memcmp(symbol, item.symbol, length))
+			if ((length == item.length) && !memcmp(payload, item.payload, length))
 			{
 				if (item.type != CamoItemProperty && item.type != CamoItemIgnore)
 				{
@@ -81,7 +81,7 @@ public:
 		CamoItem *item = (CamoItem *)malloc(sizeof(CamoItem) + length);
 		item->type = type;
 		item->length = length;
-		memcpy(item->symbol, symbol, length);
+		memcpy(item->payload, payload, length);
 		push_back(item);
 		
 		//

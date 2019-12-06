@@ -32,17 +32,17 @@ public:
 	}
 
 public:
-	void ProduceStrings(CamoVector &strings)
+	void ProduceStrings(CamoVector &items)
 	{
-		unsigned count = (unsigned)strings.size();
+		unsigned count = (unsigned)items.size();
 		for (unsigned i = 0; i < count; i++)
 		{
-			CamoItem &item = *strings[i];
+			CamoItem &item = *items[i];
 			char name[MAX_SLUGIFY];
-			unsigned length = slugify(name, item.symbol, item.length);
+			unsigned length = slugify(name, item.payload, item.length);
 
 			write(fileno(stdout), item.type == CamoItemString ? "// " : "//@", 3);
-			write(fileno(stdout), item.symbol, item.length);
+			write(fileno(stdout), item.payload, item.length);
 			write(fileno(stdout), "\n", 1);
 
 			write(fileno(stdout), "#define CAMO_", 13);
@@ -66,10 +66,10 @@ public:
 
 			for (unsigned k = 0; k < item.length; k++)
 			{
-				char c = item.symbol[k];
+				char c = item.payload[k];
 				if (c == '\\')
 				{
-					c = item.symbol[++k];
+					c = item.payload[++k];
 					if (c == 'r') c = '\r';
 					else if (c == 'n') c = '\n';
 					else if (c == 't') c = '\t';
@@ -164,11 +164,11 @@ private:
 	inline void ProduceItem(CamoItem &item, CamoItem &newItem _ALIGN_PARAM)
 	{
 		write(_fd, "#define ", sizeof("#define ") - 1);
-		write(_fd, item.symbol, item.length);
+		write(_fd, item.payload, item.length);
 		
 		_ALIGN_LOOP(item.length);
 
-		write(_fd, newItem.symbol, newItem.length);
+		write(_fd, newItem.payload, newItem.length);
 		
 		write(_fd, "\n", 1);
 	}
@@ -179,12 +179,12 @@ private:
 		write(_fd, "/* VARP */ ", sizeof("/* VARP */ ") - 1);
 		write(_fd, "#define ", sizeof("#define ") - 1);
 		write(_fd, "_", 1);
-		write(_fd, item.symbol, item.length);
+		write(_fd, item.payload, item.length);
 		
 		_ALIGN_LOOP(item.length + 3);
 		
 		write(_fd, "_", 1);
-		write(_fd, newItem.symbol, newItem.length);
+		write(_fd, newItem.payload, newItem.length);
 		
 		write(_fd, "\n", 1);
 	}
@@ -195,16 +195,16 @@ private:
 		write(_fd, "/* SETP */ ", sizeof("/* SETP */ ") - 1);
 		write(_fd, "#define ", sizeof("#define ") - 1);
 		write(_fd, "set", sizeof("set") - 1);
-		char ch1 = toupper(item.symbol[0]);
+		char ch1 = toupper(item.payload[0]);
 		write(_fd, &ch1, 1);
-		write(_fd, item.symbol + 1, item.length - 1);
+		write(_fd, item.payload + 1, item.length - 1);
 		
 		_ALIGN_LOOP(item.length + 3);
 		
 		write(_fd, "set", sizeof("set") - 1);
-		char ch2 = toupper(newItem.symbol[0]);
+		char ch2 = toupper(newItem.payload[0]);
 		write(_fd, &ch2, 1);
-		write(_fd, newItem.symbol + 1, newItem.length - 1);
+		write(_fd, newItem.payload + 1, newItem.length - 1);
 		
 		write(_fd, "\n", 1);
 	}
@@ -218,7 +218,7 @@ private:
 		while (true)
 		{
 			unsigned i = 0;
-			if (!memcmp(item.symbol, "init", 4))
+			if (!memcmp(item.payload, "init", 4))
 			{
 				memcpy(buffer, "init", 4);
 				i = 4;
@@ -229,7 +229,7 @@ private:
 				memcpy(buffer + i, prefix, prefixLength);
 				i += prefixLength;
 
-				memcpy(buffer + i, item.symbol, item.length);
+				memcpy(buffer + i, item.payload, item.length);
 				i += item.length;
 
 				CamoItem *newItem = _newItems.PushItem(buffer, i);

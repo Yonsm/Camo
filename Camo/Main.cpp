@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 	unsigned exclude = (unsigned)parser.symbols.size();
 	if (exclude)
 	{
-		printf("EXCLUDE: %d symbols\n\n", (int)exclude);
+		printf("EXCLUDE: %d items\n\n", (int)exclude);
 		
 #ifdef _SUPPORT_ALIGN
 		parser.symbols.maxLength = 0; // Reset
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 	unsigned total = (unsigned)parser.symbols.size();
 	if (total > exclude)
 	{
-		printf("INCLUDE: %d symbols\n\n", (int)(total - exclude));
+		printf("INCLUDE: %d items\n\n", (int)(total - exclude));
 		
 		CamoProducer producer(argv[1]);
 		producer.ProduceSymbols(parser.symbols, exclude);
