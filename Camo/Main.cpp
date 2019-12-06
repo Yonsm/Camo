@@ -120,19 +120,10 @@ int main(int argc, char *argv[])
 				else if (c == 't') c = '\t';
 			}
 			c = c ^ item.length - k;
-			printf("\\x%2x", c);
+			printf("\\x%02x", c);
 		}
 		printf("\", %d)\n", item.length);
 	}
-
-	if (end)
-		puts("static __inline__ __attribute__((always_inline))\nvoid CamoDecryptCString(char *dst, const char *src, signed length)\n\
-{\n\
-	for (signed i = 0; i < length; i++)\n\
-	{\n\
-		dst[i] = (src[i] + i) ^ length;\n\
-	}\n\
-}\n");
 
 	unsigned total = (unsigned)parser.symbols.size();
 	if (total > exclude)
