@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 		char name[MAX_SLUGIFY];
 		unsigned length = slugify(name, item.symbol, item.length);
 
-		write(fileno(stdout), "// ", 3);
+		write(fileno(stdout), item.type == CamoItemString ? "// " : "//@", 3);
 		write(fileno(stdout), item.symbol, item.length);
 		write(fileno(stdout), "\n", 1);
 
@@ -103,13 +103,20 @@ int main(int argc, char *argv[])
 		write(fileno(stdout), name, length);
 		write(fileno(stdout), " ", 1);
 		
-		write(fileno(stdout), "char camo_", 10);
-		write(fileno(stdout), name, length);
-		printf("[%d];", item.length + 1);
+		if (item.type == CamoItemString)
+		{
+			write(fileno(stdout), "char camo_", 10);
+			write(fileno(stdout), name, length);
+			printf("[%d];", item.length + 1);
 
-		write(fileno(stdout), " CamoDecryptCString(camo_", 25);
-		write(fileno(stdout), name, length);
-		write(fileno(stdout), ", \"", 3);
+			write(fileno(stdout), " CamoStringDecode(camo_", 23);
+			write(fileno(stdout), name, length);
+			write(fileno(stdout), ", \"", 3);
+		}
+		else
+		{
+			write(fileno(stdout), " CFBridgingRelease(CamoStringDecode2(\"", 38);
+		}
 
 		for (unsigned k = 0; k < item.length; k++)
 		{
@@ -124,7 +131,9 @@ int main(int argc, char *argv[])
 			c = (c ^ (unsigned char)item.length) - k;
 			printf("\\x%02x", c);
 		}
-		printf("\", %d)\n", item.length);
+		printf("\", %d)", item.length);
+		printf((item.type == CamoItemNSString) ? ")\n" : "\n");
+			
 	}
 	write(fileno(stdout), "\n", 1);
 

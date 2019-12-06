@@ -404,7 +404,7 @@ private:
 			else if (*p == ch)
 			{
 				if (!_exclude && ch == '"' && p > code + 3)
-					strings.PushItem(code + 1, unsigned(p - code - 1), CamoItemString);
+					strings.PushItem(code + 1, unsigned(p - code - 1), (code[-1] == '@') ? CamoItemNSString : CamoItemString);
 				PrintOut("STRING:", code, p + 1);
 				return p + 1;
 			}

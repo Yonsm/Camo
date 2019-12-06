@@ -21,6 +21,7 @@ enum CamoItemType
 	CamoItemImplementation,
 	
 	CamoItemString,
+	CamoItemNSString,
 };
 
 //
