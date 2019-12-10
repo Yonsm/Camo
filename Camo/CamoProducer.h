@@ -66,7 +66,7 @@ public:
 
 			for (unsigned k = 0; k < item.length; k++)
 			{
-				char c = item.payload[k];
+				unsigned char c = item.payload[k];
 				if (c == '\\')
 				{
 					c = item.payload[++k];
